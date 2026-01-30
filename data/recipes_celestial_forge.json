@@ -1,0 +1,15 @@
+{
+  "facility": "Небесная кузница",
+  "facility_id": "celestial_forge",
+  "recipes": [
+    {
+      "name": "Производство ксиранита",
+      "input": [
+        { "item": "stabilized_carbon", "name_ru": "Стабилизированный углерод", "amount": 2 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "xiranite", "name_ru": "Ксиранит", "amount": 1 }],
+      "time": 2
+    }
+  ]
+}

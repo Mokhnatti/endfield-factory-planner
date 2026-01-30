@@ -1,0 +1,42 @@
+{
+  "facility": "Модуль снаряжения",
+  "facility_id": "equipment",
+  "recipes": [
+    {
+      "name": "Производство аметистового компонента",
+      "input": [
+        { "item": "origeode", "name_ru": "Ориджеода", "amount": 5 },
+        { "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 5 }
+      ],
+      "output": [{ "item": "amethyst_component", "name_ru": "Аметистовый компонент", "amount": 1 }],
+      "time": 10
+    },
+    {
+      "name": "Производство ферриевого компонента",
+      "input": [
+        { "item": "origeode", "name_ru": "Ориджеода", "amount": 10 },
+        { "item": "ferrite", "name_ru": "Феррий", "amount": 10 }
+      ],
+      "output": [{ "item": "ferrite_component", "name_ru": "Ферриевый компонент", "amount": 1 }],
+      "time": 10
+    },
+    {
+      "name": "Производство кристонового компонента",
+      "input": [
+        { "item": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "amount": 10 },
+        { "item": "crystite_fiber", "name_ru": "Кристоновое волокно", "amount": 10 }
+      ],
+      "output": [{ "item": "crystite_component", "name_ru": "Кристоновый компонент", "amount": 1 }],
+      "time": 10
+    },
+    {
+      "name": "Производство ксиранитового компонента",
+      "input": [
+        { "item": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "amount": 10 },
+        { "item": "xiranite", "name_ru": "Ксиранит", "amount": 10 }
+      ],
+      "output": [{ "item": "xiranite_component", "name_ru": "Ксиранитовый компонент", "amount": 1 }],
+      "time": 10
+    }
+  ]
+}

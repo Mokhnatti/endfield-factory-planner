@@ -1,0 +1,85 @@
+{
+  "facility": "Модуль очистки",
+  "facility_id": "furnace",
+  "power": 5,
+  "recipes": [
+    {
+      "name": "Производство феррия",
+      "input": [{ "item": "ferrite_ore", "name_ru": "Ферриевая руда", "amount": 1 }],
+      "output": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство аметистового волокна",
+      "input": [{ "item": "amethyst_ore", "name_ru": "Аметистовая руда", "amount": 1 }],
+      "output": [{ "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство ориджеоды",
+      "input": [{ "item": "originium_ore", "name_ru": "Ориджиниевая руда", "amount": 1 }],
+      "output": [{ "item": "origeode", "name_ru": "Ориджеода", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство уплотнённой ориджеоды",
+      "input": [{ "item": "fine_origeode", "name_ru": "Мелкомолотая ориджеода", "amount": 1 }],
+      "output": [{ "item": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство стали",
+      "input": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 1 }],
+      "output": [{ "item": "steel", "name_ru": "Сталь", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство кристонового волокна",
+      "input": [{ "item": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "amount": 1 }],
+      "output": [{ "item": "crystite_fiber", "name_ru": "Кристоновое волокно", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство стабилизированного углерода",
+      "input": [{ "item": "carbon", "name_ru": "Углерод", "amount": 1 }],
+      "output": [{ "item": "stabilized_carbon", "name_ru": "Стабилизированный углерод", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство мелкомолотой ориджеоды",
+      "input": [{ "item": "origeode_powder", "name_ru": "Молотая ориджеода", "amount": 1 }],
+      "output": [{ "item": "fine_origeode", "name_ru": "Мелкомолотая ориджеода", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство углерода (из огнегреча)",
+      "input": [{ "item": "firegrech", "name_ru": "Огнегреч", "amount": 1 }],
+      "output": [{ "item": "carbon", "name_ru": "Углерод", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство углерода (из цитрома)",
+      "input": [{ "item": "citrom", "name_ru": "Цитром", "amount": 1 }],
+      "output": [{ "item": "carbon", "name_ru": "Углерод", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство углерода (из цзиньцао)",
+      "input": [{ "item": "jinzao", "name_ru": "Цзиньцао", "amount": 1 }],
+      "output": [{ "item": "carbon", "name_ru": "Углерод", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство углерода (из ячжэня)",
+      "input": [{ "item": "yazhen", "name_ru": "Ячжэнь", "amount": 1 }],
+      "output": [{ "item": "carbon", "name_ru": "Углерод", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого углерода",
+      "input": [{ "item": "ferrite_powder", "name_ru": "Молотый феррий", "amount": 3 }],
+      "output": [{ "item": "carbon_powder", "name_ru": "Молотый углерод", "amount": 2 }],
+      "time": 2
+    }
+  ]
+}

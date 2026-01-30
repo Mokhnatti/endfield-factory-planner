@@ -1,0 +1,30 @@
+{
+  "facility": "Модуль штамповки",
+  "facility_id": "stamping",
+  "recipes": [
+    {
+      "name": "Производство ферриевой детали",
+      "input": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 1 }],
+      "output": [{ "item": "ferrite_part", "name_ru": "Ферриевая деталь", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство аметистовой детали",
+      "input": [{ "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 1 }],
+      "output": [{ "item": "amethyst_part", "name_ru": "Аметистовая деталь", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство стальной детали",
+      "input": [{ "item": "steel", "name_ru": "Сталь", "amount": 1 }],
+      "output": [{ "item": "steel_part", "name_ru": "Стальная деталь", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство кристоновой детали",
+      "input": [{ "item": "crystite_fiber", "name_ru": "Кристоновое волокно", "amount": 1 }],
+      "output": [{ "item": "crystite_part", "name_ru": "Кристоновая деталь", "amount": 1 }],
+      "time": 2
+    }
+  ]
+}

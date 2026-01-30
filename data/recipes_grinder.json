@@ -1,0 +1,72 @@
+{
+  "facility": "Модуль перемалывания",
+  "facility_id": "grinder",
+  "recipes": [
+    {
+      "name": "Производство молотого феррия",
+      "input": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 1 }],
+      "output": [{ "item": "ferrite_powder", "name_ru": "Молотый феррий", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого аметиста",
+      "input": [{ "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 1 }],
+      "output": [{ "item": "amethyst_powder", "name_ru": "Молотый аметист", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого ориджиния",
+      "input": [{ "item": "originium_ore", "name_ru": "Ориджиниевая руда", "amount": 1 }],
+      "output": [{ "item": "originium_powder", "name_ru": "Молотый ориджиний", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого углерода",
+      "input": [{ "item": "stabilized_carbon", "name_ru": "Стабилизированный углерод", "amount": 1 }],
+      "output": [{ "item": "carbon_powder", "name_ru": "Молотый углерод", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотой ориджеоды",
+      "input": [{ "item": "origeode", "name_ru": "Ориджеода", "amount": 1 }],
+      "output": [{ "item": "origeode_powder", "name_ru": "Молотая ориджеода", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого гречецвета",
+      "input": [{ "item": "buckwheat", "name_ru": "Гречецвет", "amount": 1 }],
+      "output": [{ "item": "buckwheat_powder", "name_ru": "Молотый гречецвет", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого цитрома",
+      "input": [{ "item": "citrom", "name_ru": "Цитром", "amount": 1 }],
+      "output": [{ "item": "citrom_powder", "name_ru": "Молотый цитром", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого песчанолиста",
+      "input": [{ "item": "sandleaf", "name_ru": "Песчанолист", "amount": 1 }],
+      "output": [{ "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 3 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого акетина",
+      "input": [{ "item": "aketin", "name_ru": "Акетин", "amount": 1 }],
+      "output": [{ "item": "aketin_powder", "name_ru": "Молотый акетин", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого цзиньцао",
+      "input": [{ "item": "jinzao", "name_ru": "Цзиньцао", "amount": 1 }],
+      "output": [{ "item": "jinzao_powder", "name_ru": "Молотый цзиньцао", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого ячжэня",
+      "input": [{ "item": "yazhen", "name_ru": "Ячжэнь", "amount": 1 }],
+      "output": [{ "item": "yazhen_powder", "name_ru": "Молотый ячжэнь", "amount": 2 }],
+      "time": 2
+    }
+  ]
+}

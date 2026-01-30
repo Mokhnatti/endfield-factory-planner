@@ -1,0 +1,66 @@
+{
+  "facility": "Модуль сбора семян",
+  "facility_id": "seed_collector",
+  "recipes": [
+    {
+      "name": "Производство семени гречецвета",
+      "input": [{ "item": "buckwheat", "name_ru": "Гречецвет", "amount": 1 }],
+      "output": [{ "item": "buckwheat_seed", "name_ru": "Семя гречецвета", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени цитрома",
+      "input": [{ "item": "citrom", "name_ru": "Цитром", "amount": 1 }],
+      "output": [{ "item": "citrom_seed", "name_ru": "Семя цитрома", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени песчанолиста",
+      "input": [{ "item": "sandleaf", "name_ru": "Песчанолист", "amount": 1 }],
+      "output": [{ "item": "sandleaf_seed", "name_ru": "Семя песчанолиста", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени акетина",
+      "input": [{ "item": "aketin", "name_ru": "Акетин", "amount": 1 }],
+      "output": [{ "item": "aketin_seed", "name_ru": "Семя акетина", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени цзиньцао",
+      "input": [{ "item": "jinzao", "name_ru": "Цзиньцао", "amount": 1 }],
+      "output": [{ "item": "jinzao_seed", "name_ru": "Семя цзиньцао", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени ячжэня",
+      "input": [{ "item": "yazhen", "name_ru": "Ячжэнь", "amount": 1 }],
+      "output": [{ "item": "yazhen_seed", "name_ru": "Семя ячжэня", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени тростниковой ржи",
+      "input": [{ "item": "reed_rye", "name_ru": "Тростниковая рожь", "amount": 1 }],
+      "output": [{ "item": "reed_rye_seed", "name_ru": "Семя тростниковой ржи", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени терпкого перца",
+      "input": [{ "item": "spicy_pepper", "name_ru": "Терпкий перец", "amount": 1 }],
+      "output": [{ "item": "spicy_pepper_seed", "name_ru": "Семя терпкого перца", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени нефритового женьшеня",
+      "input": [{ "item": "jade_ginseng", "name_ru": "Нефритовый женьшень", "amount": 1 }],
+      "output": [{ "item": "jade_ginseng_seed", "name_ru": "Семя нефритового женьшеня", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство семени янтарного риса",
+      "input": [{ "item": "amber_rice", "name_ru": "Янтарный рис", "amount": 1 }],
+      "output": [{ "item": "amber_rice_seed", "name_ru": "Семя янтарного риса", "amount": 2 }],
+      "time": 2
+    }
+  ]
+}

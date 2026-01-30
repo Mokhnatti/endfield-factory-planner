@@ -1,0 +1,30 @@
+{
+  "facility": "Модуль формовки",
+  "facility_id": "shaping",
+  "recipes": [
+    {
+      "name": "Производство ферриевой бутылки",
+      "input": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 2 }],
+      "output": [{ "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство аметистовой бутылки",
+      "input": [{ "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 2 }],
+      "output": [{ "item": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство стальной бутылки",
+      "input": [{ "item": "steel", "name_ru": "Сталь", "amount": 2 }],
+      "output": [{ "item": "steel_bottle", "name_ru": "Стальная бутылка", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство кристоновой бутылки",
+      "input": [{ "item": "crystite_fiber", "name_ru": "Кристоновое волокно", "amount": 2 }],
+      "output": [{ "item": "crystite_bottle", "name_ru": "Кристоновая бутылка", "amount": 1 }],
+      "time": 2
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "facility": "Модуль наполнения",
+  "facility_id": "filling",
+  "recipes": [
+    {
+      "name": "Чистая вода (бутилированная)",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "bottled_water", "name_ru": "Чистая вода (бутилированная)", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Раствор цзиньцао (бутилированный)",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "jinzao_solution", "name_ru": "Раствор цзиньцао", "amount": 1 }
+      ],
+      "output": [{ "item": "bottled_jinzao", "name_ru": "Раствор цзиньцао (бутилированный)", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Раствор ячжэня (бутилированный)",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "yazhen_solution", "name_ru": "Раствор ячжэня", "amount": 1 }
+      ],
+      "output": [{ "item": "bottled_yazhen", "name_ru": "Раствор ячжэня (бутилированный)", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Жидкий ксиранит (бутилированный)",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "liquid_xiranite", "name_ru": "Жидкий ксиранит", "amount": 1 }
+      ],
+      "output": [{ "item": "bottled_xiranite", "name_ru": "Жидкий ксиранит (бутилированный)", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство консервированного цитрома [C]",
+      "input": [
+        { "item": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "amount": 5 },
+        { "item": "citrom_powder", "name_ru": "Молотый цитром", "amount": 5 }
+      ],
+      "output": [{ "item": "citrom_can_c", "name_ru": "Консервированный цитром [C]", "amount": 1 }],
+      "time": 10,
+      "bonds": 10
+    },
+    {
+      "name": "Производство консервированного цитрома [B]",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 10 },
+        { "item": "citrom_powder", "name_ru": "Молотый цитром", "amount": 10 }
+      ],
+      "output": [{ "item": "citrom_can_b", "name_ru": "Консервированный цитром [B]", "amount": 1 }],
+      "time": 10,
+      "bonds": 27
+    },
+    {
+      "name": "Производство консервированного цитрома [A]",
+      "input": [
+        { "item": "steel_bottle", "name_ru": "Стальная бутылка", "amount": 10 },
+        { "item": "fine_citrom_powder", "name_ru": "Измельчённый молотый цитром", "amount": 10 }
+      ],
+      "output": [{ "item": "citrom_can_a", "name_ru": "Консервированный цитром [A]", "amount": 1 }],
+      "time": 10,
+      "bonds": 70
+    },
+    {
+      "name": "Производство гречекапсулы [C]",
+      "input": [
+        { "item": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "amount": 5 },
+        { "item": "buckwheat_powder", "name_ru": "Молотый гречецвет", "amount": 5 }
+      ],
+      "output": [{ "item": "buckwheat_capsule_c", "name_ru": "Гречекапсула [C]", "amount": 1 }],
+      "time": 10,
+      "bonds": 10
+    },
+    {
+      "name": "Производство гречекапсулы [B]",
+      "input": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 10 },
+        { "item": "buckwheat_powder", "name_ru": "Молотый гречецвет", "amount": 10 }
+      ],
+      "output": [{ "item": "buckwheat_capsule_b", "name_ru": "Гречекапсула [B]", "amount": 1 }],
+      "time": 10,
+      "bonds": 27
+    },
+    {
+      "name": "Производство гречекапсулы [A]",
+      "input": [
+        { "item": "steel_bottle", "name_ru": "Стальная бутылка", "amount": 10 },
+        { "item": "fine_buckwheat_powder", "name_ru": "Измельчённый молотый гречецвет", "amount": 10 }
+      ],
+      "output": [{ "item": "buckwheat_capsule_a", "name_ru": "Гречекапсула [A]", "amount": 1 }],
+      "time": 10,
+      "bonds": 70
+    }
+  ]
+}

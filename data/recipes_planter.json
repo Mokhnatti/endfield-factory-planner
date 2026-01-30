@@ -1,0 +1,48 @@
+{
+  "facility": "Модуль посадки",
+  "facility_id": "planter",
+  "recipes": [
+    {
+      "name": "Производство гречецвета",
+      "input": [{ "item": "buckwheat_seed", "name_ru": "Семя гречецвета", "amount": 1 }],
+      "output": [{ "item": "buckwheat", "name_ru": "Гречецвет", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство цитрома",
+      "input": [{ "item": "citrom_seed", "name_ru": "Семя цитрома", "amount": 1 }],
+      "output": [{ "item": "citrom", "name_ru": "Цитром", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство песчанолиста",
+      "input": [{ "item": "sandleaf_seed", "name_ru": "Семя песчанолиста", "amount": 1 }],
+      "output": [{ "item": "sandleaf", "name_ru": "Песчанолист", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство акетина",
+      "input": [{ "item": "aketin_seed", "name_ru": "Семя акетина", "amount": 1 }],
+      "output": [{ "item": "aketin", "name_ru": "Акетин", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство цзиньцао",
+      "input": [
+        { "item": "jinzao_seed", "name_ru": "Семя цзиньцао", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "jinzao", "name_ru": "Цзиньцао", "amount": 2 }],
+      "time": 2
+    },
+    {
+      "name": "Производство ячжэня",
+      "input": [
+        { "item": "yazhen_seed", "name_ru": "Семя ячжэня", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "yazhen", "name_ru": "Ячжэнь", "amount": 2 }],
+      "time": 2
+    }
+  ]
+}

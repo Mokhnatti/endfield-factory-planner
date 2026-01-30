@@ -1,0 +1,129 @@
+{
+  "raw_materials": {
+    "ores": [
+      { "id": "originium_ore", "name_ru": "Ориджиниевая руда", "icon": "оранжевый кристалл" },
+      { "id": "amethyst_ore", "name_ru": "Аметистовая руда", "icon": "фиолетовый кристалл" },
+      { "id": "ferrite_ore", "name_ru": "Ферриевая руда", "icon": "синий кристалл" }
+    ],
+    "plants": [
+      { "id": "buckwheat", "name_ru": "Гречецвет", "icon": "красные ягоды" },
+      { "id": "citrom", "name_ru": "Цитром", "icon": "жёлтые плоды" },
+      { "id": "sandleaf", "name_ru": "Песчанолист", "icon": "бежевый плод" },
+      { "id": "aketin", "name_ru": "Акетин", "icon": "жёлтый фрукт" },
+      { "id": "jinzao", "name_ru": "Цзиньцао", "icon": "жёлтые цветы" },
+      { "id": "yazhen", "name_ru": "Ячжэнь", "icon": "колоски" },
+      { "id": "firegrech", "name_ru": "Огнегреч", "icon": "красные ягоды на ветке" },
+      { "id": "umbralin", "name_ru": "Умбралин", "icon": "оранжевые плоды" },
+      { "id": "lush_jinzao", "name_ru": "Пышный цзиньцао", "icon": "пышный жёлтый цветок" },
+      { "id": "thorny_yazhen", "name_ru": "Колючий ячжэнь", "icon": "колючее растение" },
+      { "id": "reed_rye", "name_ru": "Тростниковая рожь", "icon": "колосья" },
+      { "id": "spicy_pepper", "name_ru": "Терпкий перец", "icon": "белый цветок" },
+      { "id": "jade_ginseng", "name_ru": "Нефритовый женьшень", "icon": "корень" },
+      { "id": "amber_rice", "name_ru": "Янтарный рис", "icon": "зелёный шар" }
+    ],
+    "other": [
+      { "id": "wood", "name_ru": "Древесина", "icon": "бревно" },
+      { "id": "clean_water", "name_ru": "Чистая вода", "icon": "голубая капля" }
+    ]
+  },
+
+  "intermediate": {
+    "liquids": [
+      { "id": "jinzao_solution", "name_ru": "Раствор цзиньцао", "icon": "голубая капля" },
+      { "id": "yazhen_solution", "name_ru": "Раствор ячжэня", "icon": "зелёная капля" },
+      { "id": "liquid_xiranite", "name_ru": "Жидкий ксиранит", "icon": "жёлтая капля" }
+    ],
+    "base_materials": [
+      { "id": "carbon", "name_ru": "Углерод", "icon": "серый куб" },
+      { "id": "origeode", "name_ru": "Ориджеода", "icon": "жёлтый кристалл с гранями" },
+      { "id": "amethyst_fiber", "name_ru": "Аметистовое волокно", "icon": "зелёный кристалл" },
+      { "id": "stabilized_carbon", "name_ru": "Стабилизированный углерод", "icon": "тёмный куб" },
+      { "id": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "icon": "оранжевый кристалл" },
+      { "id": "crystite_fiber", "name_ru": "Кристоновое волокно", "icon": "синее волокно" },
+      { "id": "steel", "name_ru": "Сталь", "icon": "металлический куб" },
+      { "id": "xiranite", "name_ru": "Ксиранит", "icon": "синий куб" }
+    ],
+    "powders": [
+      { "id": "carbon_powder", "name_ru": "Молотый углерод", "icon": "серый порошок" },
+      { "id": "originium_powder", "name_ru": "Молотый ориджиний", "icon": "оранжевый порошок" },
+      { "id": "origeode_powder", "name_ru": "Молотая ориджеода", "icon": "фиолетовый порошок" },
+      { "id": "amethyst_powder", "name_ru": "Молотый аметист", "icon": "синий порошок" },
+      { "id": "ferrite_powder", "name_ru": "Молотый феррий", "icon": "жёлтый порошок" },
+      { "id": "sandleaf_powder", "name_ru": "Молотый песчанолист", "icon": "бежевый порошок" },
+      { "id": "aketin_powder", "name_ru": "Молотый акетин", "icon": "бежевый порошок" },
+      { "id": "buckwheat_powder", "name_ru": "Измельчённый молотый гречецвет", "icon": "розовый порошок" },
+      { "id": "citrom_powder", "name_ru": "Измельчённый молотый цитром", "icon": "жёлтый порошок" },
+      { "id": "fine_carbon", "name_ru": "Мелкомолотый углерод", "icon": "тёмный порошок" },
+      { "id": "fine_originium", "name_ru": "Мелкомолотый ориджиний", "icon": "оранжевый мелкий" },
+      { "id": "fine_origeode", "name_ru": "Мелкомолотая ориджеода", "icon": "жёлтый мелкий" },
+      { "id": "crystite_powder", "name_ru": "Молотый кристон", "icon": "голубой порошок" },
+      { "id": "fine_ferrite", "name_ru": "Мелкомолотый феррий", "icon": "серый мелкий" }
+    ],
+    "bottles": [
+      { "id": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "icon": "фиолетовая бутылка" },
+      { "id": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "icon": "синяя бутылка" },
+      { "id": "crystite_bottle", "name_ru": "Кристоновая бутылка", "icon": "голубая бутылка" },
+      { "id": "steel_bottle", "name_ru": "Стальная бутылка", "icon": "серая бутылка" }
+    ],
+    "parts": [
+      { "id": "amethyst_part", "name_ru": "Аметистовая деталь", "icon": "зелёная плата" },
+      { "id": "ferrite_part", "name_ru": "Ферриевая деталь", "icon": "синяя плата" },
+      { "id": "crystite_part", "name_ru": "Кристоновая деталь", "icon": "голубая плата" },
+      { "id": "steel_part", "name_ru": "Стальная деталь", "icon": "синяя плата с полосой" }
+    ],
+    "components": [
+      { "id": "amethyst_component", "name_ru": "Аметистовый компонент", "icon": "фиолетовый диск" },
+      { "id": "ferrite_component", "name_ru": "Ферриевый компонент", "icon": "серый диск" },
+      { "id": "crystite_component", "name_ru": "Кристоновый компонент", "icon": "зелёный диск" },
+      { "id": "xiranite_component", "name_ru": "Ксиранитовый компонент", "icon": "зелёный диск яркий" }
+    ]
+  },
+
+  "sellable": {
+    "batteries": [
+      { "id": "battery_ce", "name_ru": "Батарея CE Долины", "icon": "красно-синяя банка", "bonds": 30 },
+      { "id": "battery_be", "name_ru": "Батарея BE Долины", "icon": "зелёно-синяя банка", "bonds": 70 },
+      { "id": "battery_me", "name_ru": "Батарея ME Долины", "icon": "серая банка", "bonds": 16 },
+      { "id": "battery_me_ulin", "name_ru": "Батарея ME Улина", "icon": "жёлто-зелёная банка", "bonds": null }
+    ],
+    "capsules": [
+      { "id": "buckwheat_capsule_a", "name_ru": "Гречекапсула [A]", "icon": "красная капсула", "bonds": 70 },
+      { "id": "buckwheat_capsule_b", "name_ru": "Гречекапсула [B]", "icon": "оранжевая капсула", "bonds": 27 },
+      { "id": "buckwheat_capsule_c", "name_ru": "Гречекапсула [C]", "icon": "жёлтая капсула", "bonds": 10 }
+    ],
+    "citrom_cans": [
+      { "id": "citrom_can_a", "name_ru": "Консервированный цитром [A]", "icon": "жёлтая банка", "bonds": 70 },
+      { "id": "citrom_can_b", "name_ru": "Консервированный цитром [B]", "icon": "зелёная банка", "bonds": 27 },
+      { "id": "citrom_can_c", "name_ru": "Консервированный цитром [C]", "icon": "серая банка", "bonds": 10 }
+    ],
+    "simple": [
+      { "id": "origeode", "name_ru": "Ориджеода", "bonds": 1 },
+      { "id": "amethyst_part", "name_ru": "Аметистовая деталь", "bonds": 1 },
+      { "id": "ferrite_part", "name_ru": "Ферриевая деталь", "bonds": 1 },
+      { "id": "steel_part", "name_ru": "Стальная деталь", "bonds": 3 },
+      { "id": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "bonds": 2 }
+    ],
+    "other": [
+      { "id": "industrial_explosive", "name_ru": "Промышленная взрывчатка", "bonds": null },
+      { "id": "citromix", "name_ru": "Цитромикс", "bonds": null },
+      { "id": "citromix_small", "name_ru": "Цитромикс [мал.]", "bonds": null },
+      { "id": "citromix_large", "name_ru": "Цитромикс [бол.]", "bonds": null },
+      { "id": "stimulator_bubble", "name_ru": "Пузырёк стимуляторов", "bonds": null },
+      { "id": "art_tube", "name_ru": "Туба искусств", "bonds": null },
+      { "id": "stimulator_tube", "name_ru": "Туба стимуляторов", "bonds": null }
+    ]
+  },
+
+  "seeds": [
+    { "id": "buckwheat_seed", "name_ru": "Семя гречецвета" },
+    { "id": "citrom_seed", "name_ru": "Семя цитрома" },
+    { "id": "sandleaf_seed", "name_ru": "Семя песчанолиста" },
+    { "id": "aketin_seed", "name_ru": "Семя акетина" },
+    { "id": "jinzao_seed", "name_ru": "Семя цзиньцао" },
+    { "id": "yazhen_seed", "name_ru": "Семя ячжэня" },
+    { "id": "reed_rye_seed", "name_ru": "Семя тростниковой ржи" },
+    { "id": "spicy_pepper_seed", "name_ru": "Семя терпкого перца" },
+    { "id": "jade_ginseng_seed", "name_ru": "Семя нефритового женьшеня" },
+    { "id": "amber_rice_seed", "name_ru": "Семя янтарного риса" }
+  ]
+}

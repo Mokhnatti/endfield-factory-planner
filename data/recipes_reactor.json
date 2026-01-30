@@ -1,0 +1,33 @@
+{
+  "facility": "Камера реактора",
+  "facility_id": "reactor",
+  "recipes": [
+    {
+      "name": "Производство раствора цзиньцао (жидкости)",
+      "input": [
+        { "item": "jinzao_powder", "name_ru": "Молотый цзиньцао", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "jinzao_solution", "name_ru": "Раствор цзиньцао", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство раствора ячжэня (жидкости)",
+      "input": [
+        { "item": "yazhen_powder", "name_ru": "Молотый ячжэнь", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "yazhen_solution", "name_ru": "Раствор ячжэня", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство жидкого ксиранита (жидкости)",
+      "input": [
+        { "item": "xiranite", "name_ru": "Ксиранит", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "output": [{ "item": "liquid_xiranite", "name_ru": "Жидкий ксиранит", "amount": 1 }],
+      "time": 2
+    }
+  ]
+}

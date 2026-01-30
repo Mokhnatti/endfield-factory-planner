@@ -1,0 +1,42 @@
+{
+  "facility": "Модуль разделения",
+  "facility_id": "dismantler",
+  "recipes": [
+    {
+      "name": "Разделение бутилированной воды",
+      "input": [{ "item": "bottled_water", "name_ru": "Чистая вода (бутилированная)", "amount": 1 }],
+      "output": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
+      ],
+      "time": 2
+    },
+    {
+      "name": "Разделение бутилированного раствора цзиньцао",
+      "input": [{ "item": "bottled_jinzao", "name_ru": "Раствор цзиньцао (бутилированный)", "amount": 1 }],
+      "output": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "jinzao_solution", "name_ru": "Раствор цзиньцао", "amount": 1 }
+      ],
+      "time": 2
+    },
+    {
+      "name": "Разделение бутилированного раствора ячжэня",
+      "input": [{ "item": "bottled_yazhen", "name_ru": "Раствор ячжэня (бутилированный)", "amount": 1 }],
+      "output": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "yazhen_solution", "name_ru": "Раствор ячжэня", "amount": 1 }
+      ],
+      "time": 2
+    },
+    {
+      "name": "Разделение бутилированного жидкого ксиранита",
+      "input": [{ "item": "bottled_xiranite", "name_ru": "Жидкий ксиранит (бутилированный)", "amount": 1 }],
+      "output": [
+        { "item": "ferrite_bottle", "name_ru": "Ферриевая бутылка", "amount": 1 },
+        { "item": "liquid_xiranite", "name_ru": "Жидкий ксиранит", "amount": 1 }
+      ],
+      "time": 2
+    }
+  ]
+}

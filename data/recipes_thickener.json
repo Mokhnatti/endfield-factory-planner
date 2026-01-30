@@ -1,0 +1,69 @@
+{
+  "facility": "Модуль измельчения",
+  "facility_id": "thickener",
+  "recipes": [
+    {
+      "name": "Производство мелкомолотого феррия",
+      "input": [
+        { "item": "ferrite_powder", "name_ru": "Молотый феррий", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_ferrite", "name_ru": "Мелкомолотый феррий", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство молотого аметиста",
+      "input": [
+        { "item": "amethyst_powder", "name_ru": "Молотый аметист", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_amethyst", "name_ru": "Мелкомолотый аметист", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство мелкомолотого ориджиния",
+      "input": [
+        { "item": "originium_powder", "name_ru": "Молотый ориджиний", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_originium", "name_ru": "Мелкомолотый ориджиний", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство мелкомолотого углерода",
+      "input": [
+        { "item": "carbon_powder", "name_ru": "Молотый углерод", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_carbon", "name_ru": "Мелкомолотый углерод", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство мелкомолотой ориджеоды",
+      "input": [
+        { "item": "origeode_powder", "name_ru": "Молотая ориджеода", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_origeode", "name_ru": "Мелкомолотая ориджеода", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство измельчённого молотого гречецвета",
+      "input": [
+        { "item": "buckwheat_powder", "name_ru": "Молотый гречецвет", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_buckwheat_powder", "name_ru": "Измельчённый молотый гречецвет", "amount": 1 }],
+      "time": 2
+    },
+    {
+      "name": "Производство измельчённого молотого цитрома",
+      "input": [
+        { "item": "citrom_powder", "name_ru": "Молотый цитром", "amount": 2 },
+        { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
+      ],
+      "output": [{ "item": "fine_citrom_powder", "name_ru": "Измельчённый молотый цитром", "amount": 1 }],
+      "time": 2
+    }
+  ]
+}
