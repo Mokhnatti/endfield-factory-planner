@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arknights Endfield - Калькулятор облигаций</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .panel h2 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4fc3f7;
+            padding-bottom: 10px;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .resource-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+        .resource-input label {
+            flex: 1;
+            font-weight: 500;
+        }
+        .resource-input input {
+            width: 120px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-size: 16px;
+        }
+        .resource-input input:focus {
+            outline: 2px solid #ffd700;
+        }
+        .btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.4);
+        }
+        .results {
+            display: none;
+        }
+        .results.show {
+            display: block;
+        }
+        .total-bonds {
+            text-align: center;
+            font-size: 48px;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .total-bonds span {
+            font-size: 24px;
+            color: #aaa;
+        }
+        .craft-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        .craft-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4fc3f7;
+        }
+        .craft-item .name {
+            font-weight: 500;
+        }
+        .craft-item .count {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+        .craft-item .bonds {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        .warning {
+            background: rgba(255,152,0,0.2);
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .info {
+            background: rgba(33,150,243,0.2);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Arknights: Endfield - Калькулятор облигаций</h1>
+
+        <div class="panel">
+            <h2>Ваши ресурсы (руда)</h2>
+            <div class="resources-grid">
+                <div class="resource-input">
+                    <label>Ориджиниевая руда</label>
+                    <input type="number" id="originium_ore" value="0" min="0">
+                </div>
+                <div class="resource-input">
+                    <label>Аметистовая руда (кварц)</label>
+                    <input type="number" id="quartz_sand" value="0" min="0">
+                </div>
+                <div class="resource-input">
+                    <label>Ферриевая руда</label>
+                    <input type="number" id="iron_ore" value="0" min="0">
+                </div>
+            </div>
+            <div class="info">
+                Калькулятор рассчитывает максимальное количество облигаций, которое можно получить из имеющейся руды.
+                Учитываются только простые цепочки крафта (руда → деталь/бутылка).
+            </div>
+        </div>
+
+        <button class="btn" onclick="calculate()">Рассчитать</button>
+
+        <div class="results panel" id="results">
+            <h2>Результат</h2>
+            <div class="total-bonds">
+                <span>Максимум облигаций:</span><br>
+                <span id="totalBonds">0</span>
+            </div>
+
+            <h3 style="margin: 20px 0 10px; color: #4fc3f7;">Что крафтить:</h3>
+            <div class="craft-list" id="craftList"></div>
+
+            <div class="warning" id="leftoverWarning" style="display:none;">
+                <strong>Остаток ресурсов:</strong>
+                <div id="leftovers"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SELLABLE_ITEMS = {
+            'crystal_shell': { name: 'Ориджеода', bonds: 1, from: 'originium_ore', cost: 1 },
+            'glass_cmpt': { name: 'Аметистовая деталь', bonds: 1, from: 'quartz_sand', cost: 2 },
+            'iron_cmpt': { name: 'Ферриевая деталь', bonds: 1, from: 'iron_ore', cost: 2 },
+            'glass_bottle': { name: 'Аметистовая бутылка', bonds: 2, from: 'quartz_sand', cost: 4 },
+            'iron_bottle': { name: 'Железная бутылка', bonds: 2, from: 'iron_ore', cost: 4 },
+            'steel_cmpt': { name: 'Стальная деталь', bonds: 3, from: 'iron_ore', cost: 4 },
+
+            'battery_be': {
+                name: 'Батарея BE Долины',
+                bonds: 70,
+                recipe: { quartz_sand: 10, originium_ore: 10 }
+            },
+            'battery_ce': {
+                name: 'Батарея CE Долины',
+                bonds: 30,
+                recipe: { iron_ore: 20, originium_ore: 15 }
+            },
+            'battery_me': {
+                name: 'Батарея ME Долины',
+                bonds: 16,
+                recipe: { iron_ore: 40, originium_ore: 30 }
+            },
+        };
+
+        const SIMPLE_RECIPES = {
+            'crystal_shell': { from: 'originium_ore', cost: 1, bonds: 1, name: 'Ориджеода' },
+            'glass_cmpt': { from: 'quartz_sand', cost: 2, bonds: 1, name: 'Аметистовая деталь' },
+            'iron_cmpt': { from: 'iron_ore', cost: 2, bonds: 1, name: 'Ферриевая деталь' },
+            'glass_bottle': { from: 'quartz_sand', cost: 4, bonds: 2, name: 'Аметистовая бутылка' },
+        };
+
+        const COMPLEX_RECIPES = [
+            {
+                id: 'battery_be',
+                name: 'Батарея BE Долины',
+                bonds: 70,
+                cost: { quartz_sand: 10, originium_ore: 10 },
+                efficiency: 70 / 20
+            },
+            {
+                id: 'battery_ce',
+                name: 'Батарея CE Долины',
+                bonds: 30,
+                cost: { iron_ore: 20, originium_ore: 15 },
+                efficiency: 30 / 35
+            },
+            {
+                id: 'battery_me',
+                name: 'Батарея ME Долины',
+                bonds: 16,
+                cost: { iron_ore: 40, originium_ore: 30 },
+                efficiency: 16 / 70
+            },
+            {
+                id: 'food_a',
+                name: 'Гречекапсула [A]',
+                bonds: 70,
+                cost: { quartz_sand: 20, originium_ore: 0 },
+                efficiency: 70 / 20
+            },
+            {
+                id: 'food_b',
+                name: 'Гречекапсула [B]',
+                bonds: 27,
+                cost: { iron_ore: 20, quartz_sand: 0 },
+                efficiency: 27 / 20
+            },
+            {
+                id: 'citrom_a',
+                name: 'Консервированный цитром [A]',
+                bonds: 70,
+                cost: { quartz_sand: 20, originium_ore: 0 },
+                efficiency: 70 / 20
+            },
+            {
+                id: 'citrom_b',
+                name: 'Консервированный цитром [B]',
+                bonds: 27,
+                cost: { iron_ore: 20, quartz_sand: 0 },
+                efficiency: 27 / 20
+            },
+        ];
+
+        function calculate() {
+            let resources = {
+                originium_ore: parseInt(document.getElementById('originium_ore').value) || 0,
+                quartz_sand: parseInt(document.getElementById('quartz_sand').value) || 0,
+                iron_ore: parseInt(document.getElementById('iron_ore').value) || 0
+            };
+
+            let totalBonds = 0;
+            let craftPlan = [];
+
+            let sortedRecipes = [...COMPLEX_RECIPES].sort((a, b) => b.efficiency - a.efficiency);
+
+            for (let recipe of sortedRecipes) {
+                let maxCount = Infinity;
+
+                for (let [resource, amount] of Object.entries(recipe.cost)) {
+                    if (amount > 0) {
+                        maxCount = Math.min(maxCount, Math.floor(resources[resource] / amount));
+                    }
+                }
+
+                if (maxCount > 0 && maxCount !== Infinity) {
+                    for (let [resource, amount] of Object.entries(recipe.cost)) {
+                        resources[resource] -= maxCount * amount;
+                    }
+                    totalBonds += maxCount * recipe.bonds;
+                    craftPlan.push({
+                        name: recipe.name,
+                        count: maxCount,
+                        bonds: maxCount * recipe.bonds
+                    });
+                }
+            }
+
+            let simpleEfficiency = [
+                { id: 'crystal_shell', name: 'Ориджеода', from: 'originium_ore', cost: 1, bonds: 1, eff: 1 },
+                { id: 'glass_bottle', name: 'Аметистовая бутылка', from: 'quartz_sand', cost: 4, bonds: 2, eff: 0.5 },
+                { id: 'glass_cmpt', name: 'Аметистовая деталь', from: 'quartz_sand', cost: 2, bonds: 1, eff: 0.5 },
+                { id: 'iron_cmpt', name: 'Ферриевая деталь', from: 'iron_ore', cost: 2, bonds: 1, eff: 0.5 },
+            ];
+
+            for (let item of simpleEfficiency) {
+                let available = resources[item.from];
+                let count = Math.floor(available / item.cost);
+                if (count > 0) {
+                    resources[item.from] -= count * item.cost;
+                    totalBonds += count * item.bonds;
+                    craftPlan.push({
+                        name: item.name,
+                        count: count,
+                        bonds: count * item.bonds
+                    });
+                }
+            }
+
+            document.getElementById('totalBonds').textContent = totalBonds.toLocaleString();
+
+            let craftListHtml = '';
+            for (let item of craftPlan) {
+                craftListHtml += `
+                    <div class="craft-item">
+                        <span class="name">${item.name}</span>
+                        <span class="count">x${item.count}</span>
+                        <span class="bonds">${item.bonds} обл.</span>
+                    </div>
+                `;
+            }
+            document.getElementById('craftList').innerHTML = craftListHtml || '<div>Нечего крафтить</div>';
+
+            let hasLeftovers = Object.values(resources).some(v => v > 0);
+            if (hasLeftovers) {
+                document.getElementById('leftoverWarning').style.display = 'block';
+                let leftoverHtml = '';
+                if (resources.originium_ore > 0) leftoverHtml += `Ориджиниевая руда: ${resources.originium_ore}<br>`;
+                if (resources.quartz_sand > 0) leftoverHtml += `Аметистовая руда: ${resources.quartz_sand}<br>`;
+                if (resources.iron_ore > 0) leftoverHtml += `Ферриевая руда: ${resources.iron_ore}<br>`;
+                document.getElementById('leftovers').innerHTML = leftoverHtml;
+            } else {
+                document.getElementById('leftoverWarning').style.display = 'none';
+            }
+
+            document.getElementById('results').classList.add('show');
+        }
+    </script>
+</body>
+</html>
