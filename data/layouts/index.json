@@ -34,5 +34,41 @@
     "file": "sandleaf_powder_v2.json",
     "author": "Claude",
     "description": "С правильными конвейерами и поворотом гриндера"
+  },
+  {
+    "name": "Молотый песчанолист v3",
+    "file": "sandleaf_powder_v3.json",
+    "author": "Claude",
+    "description": "Правильные зоны: 2 плантера + семена + гриндер"
+  },
+  {
+    "name": "Компакт v1 (~115 тайлов)",
+    "file": "sandleaf_compact_v1.json",
+    "author": "Claude",
+    "description": "Компактная схема молотого песчанолиста"
+  },
+  {
+    "name": "Ультра-компакт (~110 тайлов)",
+    "file": "sandleaf_compact_v2.json",
+    "author": "Claude",
+    "description": "Grinder и Storage повёрнуты для прямого соединения"
+  },
+  {
+    "name": "Мини-бокс (~108 тайлов)",
+    "file": "sandleaf_compact_v3.json",
+    "author": "Claude",
+    "description": "Минимальный bounding box, всё впритык"
+  },
+  {
+    "name": "Самый экономный (127 тайлов)",
+    "file": "самый_экономный.json",
+    "author": "User",
+    "description": "Рекорд! Зазор 0 между плантерами, пилоны вне схемы"
+  },
+  {
+    "name": "Длинный (вертикальный)",
+    "file": "sandleaf_long.json",
+    "author": "Claude",
+    "description": "Максимально вытянутый в высоту, 3 пилона, длинная петля семян"
   }
 ]

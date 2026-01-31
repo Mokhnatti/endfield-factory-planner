@@ -1,0 +1,43 @@
+{
+  "name": "Молотый песчанолист - Длинный",
+  "author": "Claude",
+  "date": "2026-01-31",
+  "description": "Горизонтальная линия. Seed питает ОБА Planter семенами.",
+  "facilities": [
+    { "type": "hub", "x": 50, "y": 0 },
+    { "type": "planter", "x": 5, "y": 42, "rotation": 3 },
+    { "type": "seed_collector", "x": 11, "y": 42, "rotation": 3 },
+    { "type": "planter", "x": 17, "y": 42, "rotation": 3 },
+    { "type": "grinder", "x": 23, "y": 43, "rotation": 0 },
+    { "type": "storage", "x": 27, "y": 43, "rotation": 0 },
+    { "type": "pylon", "x": 9, "y": 40, "rotation": 0 },
+    { "type": "pylon", "x": 22, "y": 40, "rotation": 0 }
+  ],
+  "conveyors": [
+    { "x": 10, "y": 44, "dir": "r" },
+
+    { "x": 16, "y": 44, "dir": "r" },
+
+    { "x": 22, "y": 44, "dir": "r" },
+
+    { "x": 26, "y": 44, "dir": "r" },
+
+    { "x": 16, "y": 46, "dir": "d" },
+    { "x": 16, "y": 47, "dir": "l" },
+    { "x": 15, "y": 47, "dir": "l" },
+    { "x": 14, "y": 47, "dir": "l" },
+    { "x": 13, "y": 47, "dir": "l" },
+    { "x": 12, "y": 47, "dir": "l" },
+    { "x": 11, "y": 47, "dir": "l" },
+    { "x": 10, "y": 47, "dir": "l" },
+    { "x": 9, "y": 47, "dir": "l" },
+    { "x": 8, "y": 47, "dir": "l" },
+    { "x": 7, "y": 47, "dir": "l" },
+    { "x": 6, "y": 47, "dir": "l" },
+    { "x": 5, "y": 47, "dir": "l" },
+    { "x": 4, "y": 47, "dir": "u" },
+    { "x": 4, "y": 46, "dir": "u" },
+    { "x": 4, "y": 45, "dir": "u" },
+    { "x": 4, "y": 44, "dir": "r" }
+  ]
+}
