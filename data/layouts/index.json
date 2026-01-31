@@ -70,5 +70,11 @@
     "file": "sandleaf_long.json",
     "author": "Claude",
     "description": "Максимально вытянутый в высоту, 3 пилона, длинная петля семян"
+  },
+  {
+    "name": "Сталь",
+    "file": "steel.json",
+    "author": "Claude",
+    "description": "Бур→Очистка→Перемалывание + Песчанолист → Измельчение → Сталь"
   }
 ]
