@@ -1,0 +1,75 @@
+{
+  "name": "Производство стали v2",
+  "author": "Claude",
+  "date": "2026-01-31",
+  "description": "С рецептами для валидации ресурсов",
+  "facilities": [
+    { "type": "hub", "x": 50, "y": 0, "rotation": 0 },
+
+    { "type": "furnace", "x": 2, "y": 4, "rotation": 0, "recipe": "ferrite" },
+    { "type": "grinder", "x": 6, "y": 4, "rotation": 0, "recipe": "ferrite_powder" },
+
+    { "type": "thickener", "x": 10, "y": 3, "rotation": 0, "recipe": "fine_ferrite" },
+
+    { "type": "furnace", "x": 10, "y": 8, "rotation": 0, "recipe": "steel" },
+    { "type": "storage", "x": 14, "y": 8, "rotation": 0, "recipe": "any" },
+
+    { "type": "planter", "x": 17, "y": 1, "rotation": 0, "recipe": "sandleaf" },
+    { "type": "seed_collector", "x": 23, "y": 1, "rotation": 0, "recipe": "sandleaf_seed" },
+    { "type": "planter", "x": 17, "y": 7, "rotation": 0, "recipe": "sandleaf" },
+    { "type": "grinder", "x": 17, "y": 13, "rotation": 0, "recipe": "sandleaf_powder" },
+
+    { "type": "pylon", "x": 5, "y": 1, "rotation": 0 },
+    { "type": "pylon", "x": 12, "y": 0, "rotation": 0 },
+    { "type": "pylon", "x": 20, "y": 5, "rotation": 0 },
+    { "type": "pylon", "x": 12, "y": 10, "rotation": 0 }
+  ],
+  "conveyors": [
+    { "x": 1, "y": 5, "dir": "r" },
+    { "x": 5, "y": 5, "dir": "r" },
+    { "x": 9, "y": 5, "dir": "d" },
+    { "x": 9, "y": 6, "dir": "r" },
+    { "x": 9, "y": 2, "dir": "r" },
+    { "x": 12, "y": 7, "dir": "d" },
+    { "x": 13, "y": 9, "dir": "r" },
+
+    { "x": 19, "y": 6, "dir": "d" },
+
+    { "x": 22, "y": 6, "dir": "l" },
+    { "x": 21, "y": 6, "dir": "l" },
+    { "x": 20, "y": 6, "dir": "u" },
+    { "x": 20, "y": 5, "dir": "u" },
+    { "x": 20, "y": 4, "dir": "u" },
+    { "x": 20, "y": 3, "dir": "u" },
+    { "x": 20, "y": 2, "dir": "u" },
+    { "x": 20, "y": 1, "dir": "u" },
+    { "x": 20, "y": 0, "dir": "l" },
+    { "x": 19, "y": 0, "dir": "l" },
+    { "x": 18, "y": 0, "dir": "l" },
+    { "x": 17, "y": 0, "dir": "d" },
+
+    { "x": 22, "y": 0, "dir": "r" },
+
+    { "x": 19, "y": 12, "dir": "d" },
+
+    { "x": 16, "y": 14, "dir": "l" },
+    { "x": 15, "y": 14, "dir": "l" },
+    { "x": 14, "y": 14, "dir": "l" },
+    { "x": 13, "y": 14, "dir": "l" },
+    { "x": 12, "y": 14, "dir": "l" },
+    { "x": 11, "y": 14, "dir": "l" },
+    { "x": 10, "y": 14, "dir": "u" },
+    { "x": 10, "y": 13, "dir": "u" },
+    { "x": 10, "y": 12, "dir": "u" },
+    { "x": 10, "y": 11, "dir": "u" },
+    { "x": 10, "y": 10, "dir": "u" },
+    { "x": 10, "y": 9, "dir": "u" },
+    { "x": 10, "y": 8, "dir": "u" },
+    { "x": 10, "y": 7, "dir": "u" },
+    { "x": 10, "y": 6, "dir": "u" },
+    { "x": 10, "y": 5, "dir": "u" },
+    { "x": 10, "y": 4, "dir": "u" },
+    { "x": 10, "y": 3, "dir": "u" },
+    { "x": 10, "y": 2, "dir": "l" }
+  ]
+}

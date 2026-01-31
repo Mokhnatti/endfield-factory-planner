@@ -275,6 +275,57 @@
         pump:           { w: 2, h: 2, name: 'Насос',         color: '#2d4a5a', outputSide: 'any' }
     };
 
+    // Recipe database: what each facility can produce
+    const RECIPES = {
+        furnace: {
+            'ferrite': { input: ['ferrite_ore'], output: 'ferrite', name: 'Феррий' },
+            'steel': { input: ['fine_ferrite'], output: 'steel', name: 'Сталь' },
+            'amethyst_fiber': { input: ['amethyst_ore'], output: 'amethyst_fiber', name: 'Аметистовое волокно' },
+            'carbon': { input: ['sandleaf'], output: 'carbon', name: 'Углерод' }
+        },
+        grinder: {
+            'ferrite_powder': { input: ['ferrite'], output: 'ferrite_powder', name: 'Молотый феррий' },
+            'sandleaf_powder': { input: ['sandleaf'], output: 'sandleaf_powder', name: 'Молотый песчанолист' },
+            'amethyst_powder': { input: ['amethyst_fiber'], output: 'amethyst_powder', name: 'Молотый аметист' }
+        },
+        thickener: {
+            'fine_ferrite': { input: ['ferrite_powder', 'sandleaf_powder'], output: 'fine_ferrite', name: 'Мелкомолотый феррий' },
+            'crystite_powder': { input: ['amethyst_powder', 'sandleaf_powder'], output: 'crystite_powder', name: 'Молотый кристон' }
+        },
+        shaping: {
+            'ferrite_bottle': { input: ['ferrite'], output: 'ferrite_bottle', name: 'Ферриевая бутылка' },
+            'steel_bottle': { input: ['steel'], output: 'steel_bottle', name: 'Стальная бутылка' }
+        },
+        planter: {
+            'sandleaf': { input: ['sandleaf_seed'], output: 'sandleaf', name: 'Песчанолист' }
+        },
+        seed_collector: {
+            'sandleaf_seed': { input: ['sandleaf'], output: 'sandleaf_seed', name: 'Семена песчанолиста' }
+        },
+        storage: {
+            'any': { input: ['any'], output: null, name: 'Хранилище (любое)' }
+        }
+    };
+
+    // Resource names in Russian
+    const RESOURCE_NAMES = {
+        'ferrite_ore': 'Ферриевая руда',
+        'ferrite': 'Феррий',
+        'ferrite_powder': 'Молотый феррий',
+        'fine_ferrite': 'Мелкомолотый феррий',
+        'steel': 'Сталь',
+        'sandleaf': 'Песчанолист',
+        'sandleaf_seed': 'Семена песчанолиста',
+        'sandleaf_powder': 'Молотый песчанолист',
+        'amethyst_ore': 'Аметистовая руда',
+        'amethyst_fiber': 'Аметистовое волокно',
+        'amethyst_powder': 'Молотый аметист',
+        'crystite_powder': 'Молотый кристон',
+        'carbon': 'Углерод',
+        'ferrite_bottle': 'Ферриевая бутылка',
+        'steel_bottle': 'Стальная бутылка'
+    };
+
     // === STATE ===
     let zoom = 1;
     let cellSize = BASE_CELL_SIZE;
@@ -1330,6 +1381,100 @@
 
             if (!hasInputConveyor) {
                 warnings.push(`⚠️ НЕТ ВХОДА: ${f.type} (${f.x},${f.y}) - нет конвейера в зоне входа (${inputSide})`);
+            }
+        }
+
+        // 8. Resource flow validation (if recipes specified)
+        const facilitiesWithRecipes = nonPylons.filter(f => f.recipe);
+        if (facilitiesWithRecipes.length > 0) {
+            for (const f of facilitiesWithRecipes) {
+                const recipes = RECIPES[f.type];
+                if (!recipes) {
+                    warnings.push(`⚠️ РЕЦЕПТЫ: ${f.type} не имеет рецептов в базе`);
+                    continue;
+                }
+                const recipe = recipes[f.recipe];
+                if (!recipe) {
+                    errors.push(`❌ РЕЦЕПТ: ${f.type} (${f.x},${f.y}) - неизвестный рецепт "${f.recipe}"`);
+                    continue;
+                }
+
+                // Display what this facility produces
+                const inputNames = recipe.input.map(r => RESOURCE_NAMES[r] || r).join(' + ');
+                const outputName = recipe.output ? (RESOURCE_NAMES[recipe.output] || recipe.output) : 'ничего';
+                warnings.push(`ℹ️ РЕСУРС: ${f.type} (${f.x},${f.y}) [${f.recipe}]: ${inputNames} → ${outputName}`);
+            }
+        }
+
+        // 9. Check resource chain connections
+        const resourceFlow = [];
+        for (const f of facilitiesWithRecipes) {
+            const recipes = RECIPES[f.type];
+            if (!recipes || !recipes[f.recipe]) continue;
+            const recipe = recipes[f.recipe];
+            resourceFlow.push({
+                facility: f,
+                inputs: recipe.input,
+                output: recipe.output
+            });
+        }
+
+        // Check if outputs match inputs of connected facilities
+        for (const flow of resourceFlow) {
+            if (!flow.output) continue;
+
+            // Find facilities that this one connects to (via conveyors)
+            const def = FACILITIES[flow.facility.type];
+            const rot = flow.facility.rotation || 0;
+            const { outputSide } = getEffectiveSides(def, rot);
+
+            // Get output zone coordinates
+            let outputZone = [];
+            if (outputSide === 'right') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    outputZone.push({ x: flow.facility.x + def.w, y: flow.facility.y + dy });
+                }
+            } else if (outputSide === 'left') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    outputZone.push({ x: flow.facility.x - 1, y: flow.facility.y + dy });
+                }
+            } else if (outputSide === 'bottom') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    outputZone.push({ x: flow.facility.x + dx, y: flow.facility.y + def.h });
+                }
+            } else if (outputSide === 'top') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    outputZone.push({ x: flow.facility.x + dx, y: flow.facility.y - 1 });
+                }
+            }
+
+            // Find which facilities receive from this output (via conveyor path)
+            for (const pos of outputZone) {
+                const flags = getTileFlags(pos.x, pos.y);
+                // If this is also an input zone (IO overlap), check the receiving facility
+                if (flags.includes('I')) {
+                    for (const other of resourceFlow) {
+                        if (other === flow) continue;
+                        const otherDef = FACILITIES[other.facility.type];
+                        const otherRot = other.facility.rotation || 0;
+                        const { inputSide: otherInputSide } = getEffectiveSides(otherDef, otherRot);
+
+                        let isOtherInput = false;
+                        if (otherInputSide === 'left' && pos.x === other.facility.x - 1 && pos.y >= other.facility.y && pos.y < other.facility.y + otherDef.h) isOtherInput = true;
+                        if (otherInputSide === 'right' && pos.x === other.facility.x + otherDef.w && pos.y >= other.facility.y && pos.y < other.facility.y + otherDef.h) isOtherInput = true;
+                        if (otherInputSide === 'top' && pos.y === other.facility.y - 1 && pos.x >= other.facility.x && pos.x < other.facility.x + otherDef.w) isOtherInput = true;
+                        if (otherInputSide === 'bottom' && pos.y === other.facility.y + otherDef.h && pos.x >= other.facility.x && pos.x < other.facility.x + otherDef.w) isOtherInput = true;
+
+                        if (isOtherInput) {
+                            // Check if resource matches
+                            if (!other.inputs.includes(flow.output) && !other.inputs.includes('any')) {
+                                const outName = RESOURCE_NAMES[flow.output] || flow.output;
+                                const inNames = other.inputs.map(r => RESOURCE_NAMES[r] || r).join('/');
+                                errors.push(`❌ НЕСОВМЕСТИМОСТЬ: ${flow.facility.type} выдаёт "${outName}", но ${other.facility.type} (${other.facility.x},${other.facility.y}) ожидает "${inNames}"`);
+                            }
+                        }
+                    }
+                }
             }
         }
 
