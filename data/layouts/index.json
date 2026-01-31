@@ -28,5 +28,11 @@
     "file": "sandleaf_powder_claude.json",
     "author": "Claude",
     "description": "2 плантера + 1 сборщик + 1 гриндер = молотый песчанолист"
+  },
+  {
+    "name": "Молотый песчанолист v2",
+    "file": "sandleaf_powder_v2.json",
+    "author": "Claude",
+    "description": "С правильными конвейерами и поворотом гриндера"
   }
 ]
