@@ -128,6 +128,7 @@
         .icon.pump { background: #2d4a5a; }
         .icon.conveyor { background: #666; }
         .icon.select { background: #444; }
+        .icon.hub { background: #6a3030; }
     </style>
 </head>
 <body>
@@ -142,6 +143,11 @@
                 <div class="icon conveyor">→</div>
                 <span>Конвейер</span>
                 <span class="info">ЛКМ рисует</span>
+            </button>
+            <button class="tool-btn" data-tool="hub">
+                <div class="icon hub">▣</div>
+                <span>Переместить Хаб</span>
+                <span class="info">9×9</span>
             </button>
 
             <h3>Обработка (3×3)</h3>
@@ -239,10 +245,10 @@
     <script>
     // === CONSTANTS ===
     const GRID_SIZE = 60;
-    const BLOCKED_CENTER = 9;
     const BASE_CELL_SIZE = 12;
 
     const FACILITIES = {
+        hub:            { w: 9, h: 9, name: 'Хаб',           color: '#6a3030', isHub: true },
         furnace:        { w: 3, h: 3, name: 'Очистка',      color: '#5a2d2d', inputSide: 'left', outputSide: 'right' },
         grinder:        { w: 3, h: 3, name: 'Перемалывание', color: '#5a5a2d', inputSide: 'left', outputSide: 'right' },
         shaping:        { w: 3, h: 3, name: 'Формовка',      color: '#5a3d2d', inputSide: 'left', outputSide: 'right' },
@@ -302,15 +308,6 @@
             ctx.stroke();
         }
 
-        // Blocked center (9x9)
-        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
-        ctx.fillStyle = 'rgba(100, 30, 30, 0.5)';
-        ctx.fillRect(blockStart * cellSize, blockStart * cellSize,
-                     BLOCKED_CENTER * cellSize, BLOCKED_CENTER * cellSize);
-        ctx.strokeStyle = '#a44';
-        ctx.strokeRect(blockStart * cellSize, blockStart * cellSize,
-                       BLOCKED_CENTER * cellSize, BLOCKED_CENTER * cellSize);
-
         // Output zones (green areas on edges) with center dots
         for (let i = 0; i < GRID_SIZE; i += 3) {
             const centerOffset = 1; // центр из 3 тайлов (0, 1, 2)
@@ -324,14 +321,15 @@
             ctx.arc((i + centerOffset) * cellSize + cellSize/2, cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
             ctx.fill();
 
-            // Left edge - 3 тайла высотой, выход по центру
-            ctx.fillStyle = 'rgba(30, 100, 30, 0.2)';
-            ctx.fillRect(0, i * cellSize, cellSize, 3 * cellSize);
-            // Центральная точка выхода (слева)
-            ctx.fillStyle = '#4f4';
-            ctx.beginPath();
-            ctx.arc(cellSize/2, (i + centerOffset) * cellSize + cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
-            ctx.fill();
+            // Left edge - 3 тайла высотой, выход по центру (пропускаем угол i=0)
+            if (i > 0) {
+                ctx.fillStyle = 'rgba(30, 100, 30, 0.2)';
+                ctx.fillRect(0, i * cellSize, cellSize, 3 * cellSize);
+                ctx.fillStyle = '#4f4';
+                ctx.beginPath();
+                ctx.arc(cellSize/2, (i + centerOffset) * cellSize + cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
         // Conveyors
@@ -437,31 +435,22 @@
     }
 
     // === PLACEMENT LOGIC ===
-    function canPlaceFacility(x, y, w, h) {
+    function canPlaceFacility(x, y, w, h, excludeId = null) {
         if (x < 0 || y < 0 || x + w > GRID_SIZE || y + h > GRID_SIZE) return false;
-
-        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
-        const blockEnd = blockStart + BLOCKED_CENTER;
 
         for (let dy = 0; dy < h; dy++) {
             for (let dx = 0; dx < w; dx++) {
                 const cx = x + dx;
                 const cy = y + dy;
 
-                // Check blocked center
-                if (cx >= blockStart && cx < blockEnd && cy >= blockStart && cy < blockEnd) {
-                    return false;
-                }
-
-                // Check existing facilities
                 for (const f of facilities) {
+                    if (excludeId && f.id === excludeId) continue;
                     const fd = FACILITIES[f.type];
                     if (cx >= f.x && cx < f.x + fd.w && cy >= f.y && cy < f.y + fd.h) {
                         return false;
                     }
                 }
 
-                // Check conveyors
                 if (conveyors.some(c => c.x === cx && c.y === cy)) {
                     return false;
                 }
@@ -473,11 +462,6 @@
     function canPlaceConveyor(x, y) {
         if (x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE) return false;
 
-        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
-        const blockEnd = blockStart + BLOCKED_CENTER;
-        if (x >= blockStart && x < blockEnd && y >= blockStart && y < blockEnd) return false;
-
-        // Check facilities
         for (const f of facilities) {
             const fd = FACILITIES[f.type];
             if (x >= f.x && x < f.x + fd.w && y >= f.y && y < f.y + fd.h) {
@@ -490,6 +474,19 @@
 
     function placeFacility(x, y, type) {
         const def = FACILITIES[type];
+
+        if (def.isHub) {
+            const hub = facilities.find(f => FACILITIES[f.type].isHub);
+            if (hub) {
+                if (!canPlaceFacility(x, y, def.w, def.h, hub.id)) return false;
+                saveState();
+                hub.x = x;
+                hub.y = y;
+                render();
+                return true;
+            }
+        }
+
         if (!canPlaceFacility(x, y, def.w, def.h)) return false;
 
         saveState();
@@ -519,11 +516,12 @@
             return;
         }
 
-        // Remove facility
+        // Remove facility (but not hub!)
         for (let i = facilities.length - 1; i >= 0; i--) {
             const f = facilities[i];
             const fd = FACILITIES[f.type];
             if (x >= f.x && x < f.x + fd.w && y >= f.y && y < f.y + fd.h) {
+                if (fd.isHub) return;
                 facilities.splice(i, 1);
                 render();
                 return;
@@ -575,7 +573,8 @@
     function clearAll() {
         if (!confirm('Очистить всё?')) return;
         saveState();
-        facilities = [];
+        const hub = facilities.find(f => FACILITIES[f.type].isHub);
+        facilities = hub ? [hub] : [];
         conveyors = [];
         render();
     }
@@ -745,7 +744,9 @@
         }
     });
 
-    // Init
+    // Init - add hub in center
+    const hubStart = Math.floor((GRID_SIZE - 9) / 2);
+    facilities.push({ type: 'hub', x: hubStart, y: hubStart, id: 'hub' });
     resizeCanvas();
     </script>
 </body>
