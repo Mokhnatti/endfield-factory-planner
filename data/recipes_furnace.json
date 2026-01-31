@@ -2,6 +2,8 @@
   "facility": "Модуль очистки",
   "facility_id": "furnace",
   "power": 5,
+  "size": "3x3",
+  "area": 9,
   "recipes": [
     {
       "name": "Производство феррия",
@@ -19,7 +21,8 @@
       "name": "Производство ориджеоды",
       "input": [{ "item": "originium_ore", "name_ru": "Ориджиниевая руда", "amount": 1 }],
       "output": [{ "item": "origeode", "name_ru": "Ориджеода", "amount": 1 }],
-      "time": 2
+      "time": 2,
+      "bonds": 1
     },
     {
       "name": "Производство уплотнённой ориджеоды",
@@ -29,13 +32,13 @@
     },
     {
       "name": "Производство стали",
-      "input": [{ "item": "ferrite", "name_ru": "Феррий", "amount": 1 }],
+      "input": [{ "item": "fine_ferrite", "name_ru": "Мелкомолотый феррий", "amount": 1 }],
       "output": [{ "item": "steel", "name_ru": "Сталь", "amount": 1 }],
       "time": 2
     },
     {
       "name": "Производство кристонового волокна",
-      "input": [{ "item": "dense_origeode", "name_ru": "Уплотнённая ориджеода", "amount": 1 }],
+      "input": [{ "item": "crystite_powder", "name_ru": "Молотый кристон", "amount": 1 }],
       "output": [{ "item": "crystite_fiber", "name_ru": "Кристоновое волокно", "amount": 1 }],
       "time": 2
     },
@@ -47,7 +50,7 @@
     },
     {
       "name": "Производство мелкомолотой ориджеоды",
-      "input": [{ "item": "origeode_powder", "name_ru": "Молотая ориджеода", "amount": 1 }],
+      "input": [{ "item": "fine_originium", "name_ru": "Мелкомолотый ориджиний", "amount": 1 }],
       "output": [{ "item": "fine_origeode", "name_ru": "Мелкомолотая ориджеода", "amount": 1 }],
       "time": 2
     },
@@ -77,7 +80,7 @@
     },
     {
       "name": "Производство молотого углерода",
-      "input": [{ "item": "ferrite_powder", "name_ru": "Молотый феррий", "amount": 3 }],
+      "input": [{ "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 3 }],
       "output": [{ "item": "carbon_powder", "name_ru": "Молотый углерод", "amount": 2 }],
       "time": 2
     }

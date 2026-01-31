@@ -1,6 +1,9 @@
 {
   "facility": "Модуль перемалывания",
   "facility_id": "grinder",
+  "power": 5,
+  "size": "3x3",
+  "area": 9,
   "recipes": [
     {
       "name": "Производство молотого феррия",
@@ -22,7 +25,7 @@
     },
     {
       "name": "Производство молотого углерода",
-      "input": [{ "item": "stabilized_carbon", "name_ru": "Стабилизированный углерод", "amount": 1 }],
+      "input": [{ "item": "carbon", "name_ru": "Углерод", "amount": 1 }],
       "output": [{ "item": "carbon_powder", "name_ru": "Молотый углерод", "amount": 2 }],
       "time": 2
     },

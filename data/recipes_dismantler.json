@@ -1,6 +1,9 @@
 {
   "facility": "Модуль разделения",
   "facility_id": "dismantler",
+  "power": 20,
+  "size": "6x4",
+  "area": 24,
   "recipes": [
     {
       "name": "Разделение бутилированной воды",

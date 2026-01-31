@@ -1,6 +1,9 @@
 {
   "facility": "Модуль снаряжения",
   "facility_id": "equipment",
+  "power": 10,
+  "size": "6x4",
+  "area": 24,
   "recipes": [
     {
       "name": "Производство аметистового компонента",

@@ -1,6 +1,9 @@
 {
   "facility": "Модуль наполнения",
   "facility_id": "filling",
+  "power": 20,
+  "size": "6x4",
+  "area": 24,
   "recipes": [
     {
       "name": "Чистая вода (бутилированная)",

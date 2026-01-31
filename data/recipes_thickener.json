@@ -1,6 +1,9 @@
 {
   "facility": "Модуль измельчения",
   "facility_id": "thickener",
+  "power": 50,
+  "size": "6x4",
+  "area": 24,
   "recipes": [
     {
       "name": "Производство мелкомолотого феррия",
@@ -12,12 +15,12 @@
       "time": 2
     },
     {
-      "name": "Производство молотого аметиста",
+      "name": "Производство молотого кристона",
       "input": [
         { "item": "amethyst_powder", "name_ru": "Молотый аметист", "amount": 2 },
         { "item": "sandleaf_powder", "name_ru": "Молотый песчанолист", "amount": 1 }
       ],
-      "output": [{ "item": "fine_amethyst", "name_ru": "Мелкомолотый аметист", "amount": 1 }],
+      "output": [{ "item": "crystite_powder", "name_ru": "Молотый кристон", "amount": 1 }],
       "time": 2
     },
     {

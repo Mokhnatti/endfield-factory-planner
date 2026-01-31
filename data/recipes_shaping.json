@@ -1,6 +1,9 @@
 {
   "facility": "Модуль формовки",
   "facility_id": "shaping",
+  "power": 10,
+  "size": "3x3",
+  "area": 9,
   "recipes": [
     {
       "name": "Производство ферриевой бутылки",
@@ -12,7 +15,8 @@
       "name": "Производство аметистовой бутылки",
       "input": [{ "item": "amethyst_fiber", "name_ru": "Аметистовое волокно", "amount": 2 }],
       "output": [{ "item": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "amount": 1 }],
-      "time": 2
+      "time": 2,
+      "bonds": 2
     },
     {
       "name": "Производство стальной бутылки",

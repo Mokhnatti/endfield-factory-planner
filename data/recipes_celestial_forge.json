@@ -1,6 +1,9 @@
 {
   "facility": "Небесная кузница",
   "facility_id": "celestial_forge",
+  "power": 50,
+  "size": "5x5",
+  "area": 25,
   "recipes": [
     {
       "name": "Производство ксиранита",
@@ -9,7 +12,8 @@
         { "item": "clean_water", "name_ru": "Чистая вода", "amount": 1 }
       ],
       "output": [{ "item": "xiranite", "name_ru": "Ксиранит", "amount": 1 }],
-      "time": 2
+      "time": 2,
+      "bonds": 1
     }
   ]
 }

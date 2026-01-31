@@ -1,0 +1,84 @@
+{
+  "facility": "Модуль упаковки",
+  "facility_id": "packaging",
+  "power": 20,
+  "size": "6x4",
+  "area": 24,
+  "recipes": [
+    {
+      "name": "Производство промышленной взрывчатки",
+      "input": [
+        { "item": "amethyst_part", "name_ru": "Аметистовая деталь", "amount": 5 },
+        { "item": "aketin_powder", "name_ru": "Молотый акетин", "amount": 1 }
+      ],
+      "output": [{ "item": "industrial_explosive", "name_ru": "Промышленная взрывчатка", "amount": 1 }],
+      "time": 10
+    },
+    {
+      "name": "Производство батареи ME Долины",
+      "input": [
+        { "item": "amethyst_part", "name_ru": "Аметистовая деталь", "amount": 5 },
+        { "item": "originium_powder", "name_ru": "Молотый ориджиний", "amount": 10 }
+      ],
+      "output": [{ "item": "battery_me_valley", "name_ru": "Батарея ME Долины", "amount": 1 }],
+      "time": 10,
+      "bonds": 16,
+      "outpost": "valley"
+    },
+    {
+      "name": "Производство батареи CE Долины",
+      "input": [
+        { "item": "ferrite_part", "name_ru": "Ферриевая деталь", "amount": 10 },
+        { "item": "originium_powder", "name_ru": "Молотый ориджиний", "amount": 15 }
+      ],
+      "output": [{ "item": "battery_ce_valley", "name_ru": "Батарея CE Долины", "amount": 1 }],
+      "time": 10,
+      "bonds": 30,
+      "outpost": "valley"
+    },
+    {
+      "name": "Производство батареи BE Долины",
+      "input": [
+        { "item": "steel_part", "name_ru": "Стальная деталь", "amount": 10 },
+        { "item": "fine_originium", "name_ru": "Мелкомолотый ориджиний", "amount": 15 }
+      ],
+      "output": [{ "item": "battery_be_valley", "name_ru": "Батарея BE Долины", "amount": 1 }],
+      "time": 10,
+      "bonds": 70,
+      "outpost": "valley"
+    },
+    {
+      "name": "Производство инъектора ячжэня [C]",
+      "input": [
+        { "item": "ferrite_part", "name_ru": "Ферриевая деталь", "amount": 10 },
+        { "item": "yazhen_solution", "name_ru": "Раствор ячжэня", "amount": 5 }
+      ],
+      "output": [{ "item": "yazhen_injector_c", "name_ru": "Инъектор ячжэня [C]", "amount": 1 }],
+      "time": 10,
+      "bonds": 16,
+      "region": "ulin"
+    },
+    {
+      "name": "Производство напитка с цзиньцао",
+      "input": [
+        { "item": "ferrite_part", "name_ru": "Ферриевая деталь", "amount": 10 },
+        { "item": "jinzao_solution", "name_ru": "Раствор цзиньцао", "amount": 5 }
+      ],
+      "output": [{ "item": "jinzao_drink", "name_ru": "Напиток с цзиньцао", "amount": 1 }],
+      "time": 10,
+      "bonds": 16,
+      "region": "ulin"
+    },
+    {
+      "name": "Производство батареи ME Улина",
+      "input": [
+        { "item": "xiranite", "name_ru": "Ксиранит", "amount": 5 },
+        { "item": "fine_originium", "name_ru": "Мелкомолотый ориджиний", "amount": 15 }
+      ],
+      "output": [{ "item": "battery_me_ulin", "name_ru": "Батарея ME Улина", "amount": 1 }],
+      "time": 10,
+      "bonds": 25,
+      "region": "ulin"
+    }
+  ]
+}

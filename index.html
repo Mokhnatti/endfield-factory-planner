@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arknights Endfield - Калькулятор облигаций</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -17,10 +13,7 @@
             color: #e0e0e0;
             padding: 20px;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         h1 {
             text-align: center;
             color: #ffd700;
@@ -40,9 +33,57 @@
             border-bottom: 2px solid #4fc3f7;
             padding-bottom: 10px;
         }
+        .region-selector {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .region-btn {
+            padding: 15px 25px;
+            border: 2px solid #4fc3f7;
+            background: rgba(79, 195, 247, 0.1);
+            color: #4fc3f7;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .region-btn:hover {
+            background: rgba(79, 195, 247, 0.2);
+        }
+        .region-btn.active {
+            background: #4fc3f7;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .outpost-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .outpost-btn {
+            padding: 10px 20px;
+            border: 1px solid #888;
+            background: rgba(255,255,255,0.05);
+            color: #aaa;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .outpost-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .outpost-btn.active {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+        }
         .resources-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
         }
         .resource-input {
@@ -53,21 +94,15 @@
             padding: 10px 15px;
             border-radius: 10px;
         }
-        .resource-input label {
-            flex: 1;
-            font-weight: 500;
-        }
+        .resource-input label { flex: 1; font-weight: 500; }
         .resource-input input {
-            width: 120px;
+            width: 100px;
             padding: 8px 12px;
             border: none;
             border-radius: 5px;
             background: rgba(255,255,255,0.9);
             color: #333;
             font-size: 16px;
-        }
-        .resource-input input:focus {
-            outline: 2px solid #ffd700;
         }
         .btn {
             background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
@@ -86,54 +121,39 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(255,215,0,0.4);
         }
-        .results {
-            display: none;
-        }
-        .results.show {
-            display: block;
-        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .results { display: none; }
+        .results.show { display: block; }
         .total-bonds {
             text-align: center;
             font-size: 48px;
             color: #ffd700;
             margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-        .total-bonds span {
-            font-size: 24px;
-            color: #aaa;
-        }
-        .craft-list {
+        .total-bonds span { font-size: 24px; color: #aaa; }
+        .items-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 10px;
+            margin-top: 15px;
         }
-        .craft-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .item-card {
             background: rgba(0,0,0,0.3);
             padding: 12px 15px;
             border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-left: 4px solid #4fc3f7;
         }
-        .craft-item .name {
-            font-weight: 500;
-        }
-        .craft-item .count {
-            color: #4fc3f7;
-            font-weight: bold;
-        }
-        .craft-item .bonds {
+        .item-card.high { border-left-color: #ffd700; }
+        .item-card.medium { border-left-color: #ff9800; }
+        .item-card .name { flex: 1; }
+        .item-card .bonds {
             color: #ffd700;
             font-weight: bold;
-        }
-        .warning {
-            background: rgba(255,152,0,0.2);
-            border-left: 4px solid #ff9800;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+            min-width: 60px;
+            text-align: right;
         }
         .info {
             background: rgba(33,150,243,0.2);
@@ -143,221 +163,1032 @@
             margin-top: 15px;
             font-size: 14px;
         }
+        .selected-location {
+            color: #ffd700;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { color: #4fc3f7; background: rgba(0,0,0,0.2); }
+        .section-title { color: #ffd700; margin: 20px 0 10px; font-size: 18px; }
+        .energy-panel {
+            background: linear-gradient(135deg, rgba(255,100,0,0.2) 0%, rgba(255,50,0,0.1) 100%);
+            border: 2px solid #ff6600;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+        .energy-panel h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .energy-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .energy-row:last-child { border-bottom: none; }
+        .energy-row .label { color: #ccc; }
+        .energy-row .value { color: #ff9800; font-weight: bold; }
+        .energy-total {
+            font-size: 24px;
+            color: #ff6600;
+            text-align: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #ff6600;
+        }
+        .facilities-panel {
+            background: linear-gradient(135deg, rgba(79,195,247,0.15) 0%, rgba(33,150,243,0.1) 100%);
+            border: 2px solid #4fc3f7;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+        .facilities-panel h3 {
+            color: #4fc3f7;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .facilities-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .facilities-table th {
+            background: rgba(0,0,0,0.3);
+            color: #4fc3f7;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .facilities-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+        .facilities-table tr:last-child td { border-bottom: none; }
+        .facilities-table .number { text-align: center; color: #ffd700; font-weight: bold; }
+        .facilities-table .size { text-align: center; color: #888; }
+        .facilities-table .area { text-align: right; color: #4fc3f7; }
+        .facilities-table .total-row td {
+            background: rgba(0,0,0,0.3);
+            font-weight: bold;
+            border-top: 2px solid #4fc3f7;
+        }
+        .facilities-table .battery-row td { color: #ff9800; }
+        .facilities-table .gen-row td { color: #ff6600; }
+        .area-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .area-box {
+            text-align: center;
+        }
+        .area-box .label { font-size: 12px; color: #888; }
+        .area-box .value { font-size: 24px; font-weight: bold; }
+        .area-box.used .value { color: #4fc3f7; }
+        .area-box.available .value { color: #ffd700; }
+        .area-box.remaining .value { color: #4caf50; }
+        .area-box.over .value { color: #f44336; }
+        .ore-lines-panel {
+            background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.1) 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+        .ore-lines-panel h3 {
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        .ore-lines-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .ore-line-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .ore-line-box .icon { font-size: 24px; }
+        .ore-line-box .label { font-size: 11px; color: #888; margin-top: 4px; }
+        .ore-line-box .value { font-size: 28px; font-weight: bold; color: #ffd700; }
+        .ore-line-box .rate { font-size: 11px; color: #aaa; }
+        .ore-line-box.total { background: rgba(255,215,0,0.2); }
+        .ore-line-box.total .value { color: #fff; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Arknights: Endfield - Калькулятор облигаций</h1>
+        <div style="text-align:center;margin-bottom:20px">
+            <a href="layout_v2.html" style="color:#4fc3f7;font-size:14px">Редактор схем фабрики</a>
+        </div>
 
         <div class="panel">
-            <h2>Ваши ресурсы (руда)</h2>
+            <h2>📍 Выберите регион</h2>
+            <div class="region-selector" id="regionSelector"></div>
+            <div class="selected-location" id="selectedLocation"></div>
+        </div>
+
+        <div class="panel">
+            <h2>⛏️ Добыча ресурсов (в минуту)</h2>
             <div class="resources-grid">
                 <div class="resource-input">
-                    <label>Ориджиниевая руда</label>
-                    <input type="number" id="originium_ore" value="0" min="0">
+                    <label>🟡 Ориджиниевая руда/мин</label>
+                    <input type="number" id="originium_ore" value="360" min="0" step="0.1">
                 </div>
                 <div class="resource-input">
-                    <label>Аметистовая руда (кварц)</label>
-                    <input type="number" id="quartz_sand" value="0" min="0">
+                    <label>🟣 Аметистовая руда/мин</label>
+                    <input type="number" id="amethyst_ore" value="240" min="0" step="0.1">
                 </div>
                 <div class="resource-input">
-                    <label>Ферриевая руда</label>
-                    <input type="number" id="iron_ore" value="0" min="0">
+                    <label>🔵 Ферриевая руда/мин</label>
+                    <input type="number" id="ferrite_ore" value="1080" min="0" step="0.1">
                 </div>
             </div>
-            <div class="info">
-                Калькулятор рассчитывает максимальное количество облигаций, которое можно получить из имеющейся руды.
-                Учитываются только простые цепочки крафта (руда → деталь/бутылка).
+            <button class="btn" onclick="calculate()">Рассчитать</button>
+            <div id="calcResult" style="display:none; margin-top:20px;">
+                <div class="total-bonds">
+                    <span>Скорость облигаций:</span><br>
+                    <span id="totalBonds">0</span>
+                </div>
+                <div class="section-title">Производство:</div>
+                <div class="items-grid" id="craftList"></div>
             </div>
         </div>
 
-        <button class="btn" onclick="calculate()">Рассчитать</button>
-
-        <div class="results panel" id="results">
-            <h2>Результат</h2>
-            <div class="total-bonds">
-                <span>Максимум облигаций:</span><br>
-                <span id="totalBonds">0</span>
-            </div>
-
-            <h3 style="margin: 20px 0 10px; color: #4fc3f7;">Что крафтить:</h3>
-            <div class="craft-list" id="craftList"></div>
-
-            <div class="warning" id="leftoverWarning" style="display:none;">
-                <strong>Остаток ресурсов:</strong>
-                <div id="leftovers"></div>
-            </div>
+        <div class="panel">
+            <h2>🔧 Рецепты с облигациями</h2>
+            <table id="allRecipesTable">
+                <thead>
+                    <tr><th style="width:40px"><input type="checkbox" id="checkAllRecipes" checked onchange="toggleAllRecipes(this.checked)"></th><th>Товар</th><th>Облигации</th><th>Где продаётся</th><th>Ингредиенты</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        const SELLABLE_ITEMS = {
-            'crystal_shell': { name: 'Ориджеода', bonds: 1, from: 'originium_ore', cost: 1 },
-            'glass_cmpt': { name: 'Аметистовая деталь', bonds: 1, from: 'quartz_sand', cost: 2 },
-            'iron_cmpt': { name: 'Ферриевая деталь', bonds: 1, from: 'iron_ore', cost: 2 },
-            'glass_bottle': { name: 'Аметистовая бутылка', bonds: 2, from: 'quartz_sand', cost: 4 },
-            'iron_bottle': { name: 'Железная бутылка', bonds: 2, from: 'iron_ore', cost: 4 },
-            'steel_cmpt': { name: 'Стальная деталь', bonds: 3, from: 'iron_ore', cost: 4 },
+    let sellableData = null;
+    let allRecipes = [];
+    let selectedRegion = null;
 
-            'battery_be': {
-                name: 'Батарея BE Долины',
-                bonds: 70,
-                recipe: { quartz_sand: 10, originium_ore: 10 }
-            },
-            'battery_ce': {
-                name: 'Батарея CE Долины',
-                bonds: 30,
-                recipe: { iron_ore: 20, originium_ore: 15 }
-            },
-            'battery_me': {
-                name: 'Батарея ME Долины',
-                bonds: 16,
-                recipe: { iron_ore: 40, originium_ore: 30 }
-            },
-        };
+    async function loadData() {
+        try {
+            const resp = await fetch('data/sellable_items.json');
+            sellableData = await resp.json();
+            renderRegions();
+        } catch (e) {
+            console.error('Failed to load sellable items', e);
+        }
 
-        const SIMPLE_RECIPES = {
-            'crystal_shell': { from: 'originium_ore', cost: 1, bonds: 1, name: 'Ориджеода' },
-            'glass_cmpt': { from: 'quartz_sand', cost: 2, bonds: 1, name: 'Аметистовая деталь' },
-            'iron_cmpt': { from: 'iron_ore', cost: 2, bonds: 1, name: 'Ферриевая деталь' },
-            'glass_bottle': { from: 'quartz_sand', cost: 4, bonds: 2, name: 'Аметистовая бутылка' },
-        };
-
-        const COMPLEX_RECIPES = [
-            {
-                id: 'battery_be',
-                name: 'Батарея BE Долины',
-                bonds: 70,
-                cost: { quartz_sand: 10, originium_ore: 10 },
-                efficiency: 70 / 20
-            },
-            {
-                id: 'battery_ce',
-                name: 'Батарея CE Долины',
-                bonds: 30,
-                cost: { iron_ore: 20, originium_ore: 15 },
-                efficiency: 30 / 35
-            },
-            {
-                id: 'battery_me',
-                name: 'Батарея ME Долины',
-                bonds: 16,
-                cost: { iron_ore: 40, originium_ore: 30 },
-                efficiency: 16 / 70
-            },
-            {
-                id: 'food_a',
-                name: 'Гречекапсула [A]',
-                bonds: 70,
-                cost: { quartz_sand: 20, originium_ore: 0 },
-                efficiency: 70 / 20
-            },
-            {
-                id: 'food_b',
-                name: 'Гречекапсула [B]',
-                bonds: 27,
-                cost: { iron_ore: 20, quartz_sand: 0 },
-                efficiency: 27 / 20
-            },
-            {
-                id: 'citrom_a',
-                name: 'Консервированный цитром [A]',
-                bonds: 70,
-                cost: { quartz_sand: 20, originium_ore: 0 },
-                efficiency: 70 / 20
-            },
-            {
-                id: 'citrom_b',
-                name: 'Консервированный цитром [B]',
-                bonds: 27,
-                cost: { iron_ore: 20, quartz_sand: 0 },
-                efficiency: 27 / 20
-            },
+        const recipeFiles = [
+            'recipes_furnace.json',
+            'recipes_grinder.json',
+            'recipes_stamping.json',
+            'recipes_shaping.json',
+            'recipes_thickener.json',
+            'recipes_filling.json',
+            'recipes_packaging.json',
+            'recipes_planter.json',
+            'recipes_seeds.json',
+            'recipes_celestial_forge.json',
+            'recipes_reactor.json',
+            'recipes_dismantler.json',
+            'recipes_equipment.json'
         ];
 
-        function calculate() {
-            let resources = {
-                originium_ore: parseInt(document.getElementById('originium_ore').value) || 0,
-                quartz_sand: parseInt(document.getElementById('quartz_sand').value) || 0,
-                iron_ore: parseInt(document.getElementById('iron_ore').value) || 0
+        for (const file of recipeFiles) {
+            try {
+                const resp = await fetch('data/' + file);
+                const data = await resp.json();
+                allRecipes.push(data);
+            } catch (e) {
+                console.warn('Failed to load ' + file, e);
+            }
+        }
+
+        buildRecipeIndex();
+        renderAllRecipes();
+    }
+
+    let recipeIndex = {};
+
+    function buildRecipeIndex() {
+        recipeIndex = {};
+        for (const facility of allRecipes) {
+            for (const recipe of facility.recipes) {
+                const outputItem = recipe.output[0].item;
+                if (!recipeIndex[outputItem]) {
+                    recipeIndex[outputItem] = [];
+                }
+                recipeIndex[outputItem].push({
+                    ...recipe,
+                    facility: facility.facility_id
+                });
+            }
+        }
+    }
+
+    const FREE_PLANTS = ['buckwheat', 'citrom', 'sandleaf', 'aketin', 'jinzao', 'yazhen'];
+    const FREE_SEEDS = ['buckwheat_seed', 'citrom_seed', 'sandleaf_seed', 'aketin_seed', 'jinzao_seed', 'yazhen_seed'];
+    const FREE_RESOURCES = ['clean_water'];
+    const PLANT_CYCLE_TIME = 4;
+
+    function calcRawCost(itemId, amount, memo = {}) {
+        const key = `${itemId}:${amount}`;
+        if (memo[key]) return memo[key];
+
+        const rawOres = ['originium_ore', 'amethyst_ore', 'ferrite_ore'];
+        if (rawOres.includes(itemId)) {
+            return memo[key] = { [itemId]: amount, facilityTime: {} };
+        }
+
+        if (FREE_PLANTS.includes(itemId)) {
+            return memo[key] = { plants: amount, facilityTime: { planter: amount * PLANT_CYCLE_TIME } };
+        }
+
+        if (FREE_SEEDS.includes(itemId)) {
+            return memo[key] = { plants: amount, facilityTime: { seed_collector: amount * 2 } };
+        }
+
+        if (FREE_RESOURCES.includes(itemId)) {
+            return memo[key] = { clean_water: amount, facilityTime: {} };
+        }
+
+        const recipes = recipeIndex[itemId];
+        if (!recipes || recipes.length === 0) {
+            return memo[key] = { unavailable: itemId, facilityTime: {} };
+        }
+
+        const recipe = recipes[0];
+        const facility = recipe.facility || 'unknown';
+        const outputAmount = recipe.output[0].amount;
+        const craftCount = Math.ceil(amount / outputAmount);
+        const craftTime = craftCount * recipe.time;
+
+        let totalCost = { facilityTime: { [facility]: craftTime } };
+        for (const input of recipe.input) {
+            const inputCost = calcRawCost(input.item, input.amount * craftCount, memo);
+            for (const [res, qty] of Object.entries(inputCost)) {
+                if (res === 'facilityTime') {
+                    for (const [fac, time] of Object.entries(qty)) {
+                        totalCost.facilityTime[fac] = (totalCost.facilityTime[fac] || 0) + time;
+                    }
+                } else if (res === 'plants') {
+                    totalCost.plants = (totalCost.plants || 0) + qty;
+                } else {
+                    totalCost[res] = (totalCost[res] || 0) + qty;
+                }
+            }
+        }
+
+        return memo[key] = totalCost;
+    }
+
+    function renderRegions() {
+        const container = document.getElementById('regionSelector');
+        container.innerHTML = '';
+
+        for (const region of sellableData.regions) {
+            const btn = document.createElement('button');
+            btn.className = 'region-btn';
+            btn.textContent = `${region.name} (Регион ${region.number})`;
+            btn.onclick = () => selectRegion(region);
+            container.appendChild(btn);
+        }
+
+        if (sellableData.regions.length > 0) {
+            selectRegion(sellableData.regions[0]);
+        }
+    }
+
+    function selectRegion(region) {
+        selectedRegion = region;
+
+        document.querySelectorAll('.region-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', sellableData.regions[i].id === region.id);
+        });
+
+        document.getElementById('selectedLocation').textContent =
+            `Выбрано: ${region.name} (${region.outposts.length} аванпостов)`;
+    }
+
+    function toggleAllRecipes(checked) {
+        document.querySelectorAll('.recipe-checkbox').forEach(cb => {
+            cb.checked = checked;
+        });
+    }
+
+    const CONVEYOR_SPEED = 30;
+    const FACILITY_NAMES = {
+        furnace: 'Очистка',
+        grinder: 'Перемалывание',
+        stamping: 'Штамповка',
+        shaping: 'Формовка',
+        thickener: 'Измельчение',
+        filling: 'Наполнение',
+        packaging: 'Упаковка',
+        planter: 'Посадка',
+        seed_collector: 'Сбор семян',
+        celestial_forge: 'Небесная кузница',
+        reactor: 'Реактор',
+        dismantler: 'Разделение',
+        equipment: 'Снаряжение'
+    };
+
+    const DRILL_RATE = 10;
+    const PUMP_RATE = 60;
+    const DRILL_POWER = 10;
+    const PUMP_POWER = 10;
+    const PLOT_BLOCKED_AREA = 81;
+    const FACILITY_SPACING = 2;
+    const PYLON_COVERAGE = 144;
+    const PYLON_SIZE = 4;
+
+    const GENERATORS = [
+        { id: 'gen_ulin', name: 'Генератор', energy: 1600, burnTime: 40, battery: 'battery_me_ulin', batteryName: 'Батарея ME Улина', region: 'ulin', area: 4, size: '2x2' },
+        { id: 'gen_valley', name: 'Генератор', energy: 1100, burnTime: 40, battery: 'battery_be_valley', batteryName: 'Батарея BE Долины', region: 'valley', area: 4, size: '2x2' },
+        { id: 'gen_ce', name: 'Генератор', energy: 420, burnTime: 40, battery: 'battery_ce_valley', batteryName: 'Батарея CE Долины', region: 'valley', area: 4, size: '2x2' },
+        { id: 'gen_me', name: 'Генератор', energy: 220, burnTime: 40, battery: 'battery_me_valley', batteryName: 'Батарея ME Долины', region: 'valley', area: 4, size: '2x2' },
+        { id: 'gen_ore', name: 'Генератор', energy: 50, burnTime: 8, battery: 'originium_ore', batteryName: 'Ориджиниевая руда', region: 'all', area: 4, size: '2x2' }
+    ];
+
+    function getFacilityPower(facilityId) {
+        for (const facility of allRecipes) {
+            if (facility.facility_id === facilityId) {
+                return facility.power || 0;
+            }
+        }
+        return 0;
+    }
+
+    function getFacilityArea(facilityId) {
+        for (const facility of allRecipes) {
+            if (facility.facility_id === facilityId) {
+                return facility.area || 0;
+            }
+        }
+        return 0;
+    }
+
+    function getFacilitySize(facilityId) {
+        for (const facility of allRecipes) {
+            if (facility.facility_id === facilityId) {
+                return facility.size || '';
+            }
+        }
+        return '';
+    }
+
+    function getEffectiveArea(facilityId) {
+        const size = getFacilitySize(facilityId);
+        if (!size) return getFacilityArea(facilityId);
+        const parts = size.split('x');
+        if (parts.length !== 2) return getFacilityArea(facilityId);
+        const w = parseInt(parts[0]);
+        const h = parseInt(parts[1]) + FACILITY_SPACING;
+        return w * h;
+    }
+
+    function getEffectiveAreaFromSize(sizeStr) {
+        if (!sizeStr) return 0;
+        const parts = sizeStr.split('x');
+        if (parts.length !== 2) return 0;
+        const w = parseInt(parts[0]);
+        const h = parseInt(parts[1]) + FACILITY_SPACING;
+        return w * h;
+    }
+
+    function calcFacilitiesNeeded(itemId, ratePerMin, memo = {}) {
+        const facilities = {};
+
+        const rawOres = ['originium_ore', 'amethyst_ore', 'ferrite_ore'];
+        if (rawOres.includes(itemId) || FREE_RESOURCES.includes(itemId)) {
+            return facilities;
+        }
+
+        if (FREE_PLANTS.includes(itemId)) {
+            const planterRate = 30;
+            const seedCollectorRate = 30;
+            const totalPlantsNeeded = ratePerMin * 2;
+            const plantsForSeeds = ratePerMin;
+            facilities['planter'] = Math.ceil(totalPlantsNeeded / planterRate);
+            facilities['seed_collector'] = Math.ceil(plantsForSeeds / seedCollectorRate);
+            return facilities;
+        }
+
+        if (FREE_SEEDS.includes(itemId)) {
+            const seedCollectorRate = 60;
+            facilities['seed_collector'] = Math.ceil(ratePerMin / seedCollectorRate);
+            return facilities;
+        }
+
+        const recipes = recipeIndex[itemId];
+        if (!recipes || recipes.length === 0) return facilities;
+
+        const recipe = recipes[0];
+        const facility = recipe.facility || 'unknown';
+        const outputAmount = recipe.output[0].amount;
+        const craftTime = recipe.time;
+
+        const itemsPerMinPerFacility = (60 / craftTime) * outputAmount;
+        const facilitiesNeeded = Math.ceil(ratePerMin / itemsPerMinPerFacility);
+
+        facilities[facility] = (facilities[facility] || 0) + facilitiesNeeded;
+
+        for (const input of recipe.input) {
+            const inputRateNeeded = (input.amount / outputAmount) * ratePerMin;
+            const subFacilities = calcFacilitiesNeeded(input.item, inputRateNeeded, memo);
+            for (const [fac, count] of Object.entries(subFacilities)) {
+                facilities[fac] = (facilities[fac] || 0) + count;
+            }
+        }
+
+        return facilities;
+    }
+
+    function findBestGenerator(totalEnergy, regionId) {
+        let bestGen = null;
+        let bestTotalOreCost = Infinity;
+        let bestInfo = {};
+
+        const availableGens = GENERATORS.filter(g => g.region === 'all' || g.region === regionId);
+        for (const gen of availableGens) {
+            const generatorsNeeded = Math.ceil(totalEnergy / gen.energy);
+            const batteriesPerMin = generatorsNeeded * (60 / gen.burnTime);
+
+            let lostBonds = 0;
+            let oreCost = { originium_ore: 0, amethyst_ore: 0, ferrite_ore: 0 };
+
+            if (gen.battery === 'originium_ore') {
+                oreCost.originium_ore = batteriesPerMin;
+            } else {
+                for (const facility of allRecipes) {
+                    for (const recipe of facility.recipes) {
+                        if (recipe.output[0].item === gen.battery && recipe.bonds) {
+                            lostBonds = recipe.bonds * batteriesPerMin;
+                        }
+                    }
+                }
+                const cost = calcRawCost(gen.battery, 1);
+                oreCost.originium_ore = (cost.originium_ore || 0) * batteriesPerMin;
+                oreCost.amethyst_ore = (cost.amethyst_ore || 0) * batteriesPerMin;
+                oreCost.ferrite_ore = (cost.ferrite_ore || 0) * batteriesPerMin;
+            }
+
+            const totalOreCost = oreCost.originium_ore + oreCost.amethyst_ore + oreCost.ferrite_ore;
+
+            if (totalOreCost < bestTotalOreCost) {
+                bestTotalOreCost = totalOreCost;
+                bestGen = gen;
+                bestInfo = { generatorsNeeded, batteriesPerMin, lostBonds, oreCost };
+            }
+        }
+
+        return { gen: bestGen, info: bestInfo };
+    }
+
+    function calculate() {
+        const inputOre = {
+            originium_ore: parseFloat(document.getElementById('originium_ore').value) || 0,
+            amethyst_ore: parseFloat(document.getElementById('amethyst_ore').value) || 0,
+            ferrite_ore: parseFloat(document.getElementById('ferrite_ore').value) || 0
+        };
+
+        const enabledRecipes = new Set();
+        document.querySelectorAll('.recipe-checkbox:checked').forEach(cb => {
+            enabledRecipes.add(cb.dataset.item);
+        });
+
+        let batteryOreCost = { originium_ore: 0, amethyst_ore: 0, ferrite_ore: 0 };
+        let bestGenerator = null;
+        let iterations = 0;
+        const MAX_ITERATIONS = 5;
+
+        const sellableRecipes = [];
+        for (const facility of allRecipes) {
+            for (const recipe of facility.recipes) {
+                if (recipe.bonds && enabledRecipes.has(recipe.output[0].item)) {
+                    const itemId = recipe.output[0].item;
+                    const cost = calcRawCost(itemId, 1);
+
+                    if (!cost.unavailable) {
+                        const totalOre = (cost.originium_ore || 0) + (cost.amethyst_ore || 0) + (cost.ferrite_ore || 0);
+                        sellableRecipes.push({
+                            item: itemId,
+                            name: recipe.output[0].name_ru,
+                            bonds: recipe.bonds,
+                            cost: cost,
+                            oreEfficiency: totalOre > 0 ? recipe.bonds / totalOre : Infinity
+                        });
+                    }
+                }
+            }
+        }
+
+        sellableRecipes.sort((a, b) => b.oreEfficiency - a.oreEfficiency);
+
+        let totalBondsPerMin = 0;
+        let details = [];
+        let remainingRate = {};
+        let available = {};
+        let totalFacilities = {};
+        let drillsNeeded = 0, pumpsNeeded = 0;
+        let drillEnergy = 0, pumpEnergy = 0, facilityEnergy = 0;
+        let facilityEnergyDetails = [];
+        let totalEnergy = 0;
+        let totalWaterPerMin = 0;
+        let usedOrePerMin = 0;
+        let usedOreByType = { originium: 0, amethyst: 0, ferrite: 0 };
+        let oreLines = { originium: 0, amethyst: 0, ferrite: 0, total: 0 };
+        let batteryFacilities = {};
+        let batteryFacilityEnergy = 0;
+
+        while (iterations < MAX_ITERATIONS) {
+            iterations++;
+
+            available = {
+                originium_ore: Math.max(0, inputOre.originium_ore - batteryOreCost.originium_ore),
+                amethyst_ore: Math.max(0, inputOre.amethyst_ore - batteryOreCost.amethyst_ore),
+                ferrite_ore: Math.max(0, inputOre.ferrite_ore - batteryOreCost.ferrite_ore)
             };
 
-            let totalBonds = 0;
-            let craftPlan = [];
+            totalBondsPerMin = 0;
+            details = [];
+            remainingRate = { ...available };
+            totalFacilities = {};
 
-            let sortedRecipes = [...COMPLEX_RECIPES].sort((a, b) => b.efficiency - a.efficiency);
+            console.log('=== Начало расчёта ===');
+            console.log('Доступно руды/мин:', available);
 
-            for (let recipe of sortedRecipes) {
-                let maxCount = Infinity;
-
-                for (let [resource, amount] of Object.entries(recipe.cost)) {
-                    if (amount > 0) {
-                        maxCount = Math.min(maxCount, Math.floor(resources[resource] / amount));
+            for (const recipe of sellableRecipes) {
+                let maxItems = Infinity;
+                for (const [ore, need] of Object.entries(recipe.cost)) {
+                    if (ore === 'facilityTime' || ore === 'plants') continue;
+                    if (remainingRate[ore] !== undefined && need > 0) {
+                        const possible = remainingRate[ore] / need;
+                        maxItems = Math.min(maxItems, possible);
                     }
                 }
 
-                if (maxCount > 0 && maxCount !== Infinity) {
-                    for (let [resource, amount] of Object.entries(recipe.cost)) {
-                        resources[resource] -= maxCount * amount;
+                if (maxItems > 0.01 && maxItems !== Infinity) {
+                    for (const [ore, need] of Object.entries(recipe.cost)) {
+                        if (ore === 'facilityTime' || ore === 'plants') continue;
+                        if (remainingRate[ore] !== undefined) {
+                            remainingRate[ore] -= need * maxItems;
+                        }
                     }
-                    totalBonds += maxCount * recipe.bonds;
-                    craftPlan.push({
+
+                    const bondsPerMin = recipe.bonds * maxItems;
+                    totalBondsPerMin += bondsPerMin;
+
+                    const facilities = calcFacilitiesNeeded(recipe.item, maxItems);
+
+                    console.log(`${recipe.name}: ${maxItems.toFixed(2)}/мин = ${bondsPerMin.toFixed(1)} обл/мин`);
+
+                    details.push({
+                        item: recipe.item,
                         name: recipe.name,
-                        count: maxCount,
-                        bonds: maxCount * recipe.bonds
+                        rate: maxItems,
+                        bondsPerMin: bondsPerMin,
+                        facilities: facilities
                     });
                 }
             }
 
-            let simpleEfficiency = [
-                { id: 'crystal_shell', name: 'Ориджеода', from: 'originium_ore', cost: 1, bonds: 1, eff: 1 },
-                { id: 'glass_bottle', name: 'Аметистовая бутылка', from: 'quartz_sand', cost: 4, bonds: 2, eff: 0.5 },
-                { id: 'glass_cmpt', name: 'Аметистовая деталь', from: 'quartz_sand', cost: 2, bonds: 1, eff: 0.5 },
-                { id: 'iron_cmpt', name: 'Ферриевая деталь', from: 'iron_ore', cost: 2, bonds: 1, eff: 0.5 },
-            ];
+            console.log('=== Итого ===');
+            for (const d of details) {
+                if (d.facilities) {
+                    for (const [f, c] of Object.entries(d.facilities)) {
+                        totalFacilities[f] = (totalFacilities[f] || 0) + c;
+                    }
+                }
+            }
 
-            for (let item of simpleEfficiency) {
-                let available = resources[item.from];
-                let count = Math.floor(available / item.cost);
-                if (count > 0) {
-                    resources[item.from] -= count * item.cost;
-                    totalBonds += count * item.bonds;
-                    craftPlan.push({
-                        name: item.name,
+            totalWaterPerMin = 0;
+            for (const d of details) {
+                const cost = calcRawCost(d.item || '', 1);
+                if (cost.clean_water) {
+                    totalWaterPerMin += cost.clean_water * d.rate;
+                }
+            }
+
+            const totalOrePerMin = available.originium_ore + available.amethyst_ore + available.ferrite_ore;
+            usedOrePerMin = totalOrePerMin - (remainingRate.originium_ore + remainingRate.amethyst_ore + remainingRate.ferrite_ore);
+
+            usedOreByType = {
+                originium: available.originium_ore - remainingRate.originium_ore,
+                amethyst: available.amethyst_ore - remainingRate.amethyst_ore,
+                ferrite: available.ferrite_ore - remainingRate.ferrite_ore
+            };
+
+            oreLines = {
+                originium: Math.ceil(usedOreByType.originium / CONVEYOR_SPEED),
+                amethyst: Math.ceil(usedOreByType.amethyst / CONVEYOR_SPEED),
+                ferrite: Math.ceil(usedOreByType.ferrite / CONVEYOR_SPEED),
+                total: Math.ceil(usedOreByType.originium / CONVEYOR_SPEED) + Math.ceil(usedOreByType.amethyst / CONVEYOR_SPEED) + Math.ceil(usedOreByType.ferrite / CONVEYOR_SPEED)
+            };
+
+            drillsNeeded = Math.ceil(usedOrePerMin / DRILL_RATE);
+            pumpsNeeded = Math.ceil(totalWaterPerMin / PUMP_RATE);
+
+            drillEnergy = drillsNeeded * DRILL_POWER;
+            pumpEnergy = pumpsNeeded * PUMP_POWER;
+
+            facilityEnergy = 0;
+            facilityEnergyDetails = [];
+            for (const [facilityId, count] of Object.entries(totalFacilities)) {
+                const power = getFacilityPower(facilityId);
+                const energy = power * count;
+                facilityEnergy += energy;
+                if (energy > 0) {
+                    facilityEnergyDetails.push({
+                        name: FACILITY_NAMES[facilityId] || facilityId,
                         count: count,
-                        bonds: count * item.bonds
+                        power: power,
+                        energy: energy
                     });
                 }
             }
 
-            document.getElementById('totalBonds').textContent = totalBonds.toLocaleString();
+            totalEnergy = drillEnergy + pumpEnergy + facilityEnergy;
 
-            let craftListHtml = '';
-            for (let item of craftPlan) {
-                craftListHtml += `
-                    <div class="craft-item">
-                        <span class="name">${item.name}</span>
-                        <span class="count">x${item.count}</span>
-                        <span class="bonds">${item.bonds} обл.</span>
-                    </div>
-                `;
-            }
-            document.getElementById('craftList').innerHTML = craftListHtml || '<div>Нечего крафтить</div>';
+            bestGenerator = findBestGenerator(totalEnergy, selectedRegion.id);
 
-            let hasLeftovers = Object.values(resources).some(v => v > 0);
-            if (hasLeftovers) {
-                document.getElementById('leftoverWarning').style.display = 'block';
-                let leftoverHtml = '';
-                if (resources.originium_ore > 0) leftoverHtml += `Ориджиниевая руда: ${resources.originium_ore}<br>`;
-                if (resources.quartz_sand > 0) leftoverHtml += `Аметистовая руда: ${resources.quartz_sand}<br>`;
-                if (resources.iron_ore > 0) leftoverHtml += `Ферриевая руда: ${resources.iron_ore}<br>`;
-                document.getElementById('leftovers').innerHTML = leftoverHtml;
-            } else {
-                document.getElementById('leftoverWarning').style.display = 'none';
+            batteryFacilities = {};
+            batteryFacilityEnergy = 0;
+            if (bestGenerator.gen && bestGenerator.gen.battery !== 'originium_ore') {
+                batteryFacilities = calcFacilitiesNeeded(bestGenerator.gen.battery, bestGenerator.info.batteriesPerMin);
+                for (const [facilityId, count] of Object.entries(batteryFacilities)) {
+                    const power = getFacilityPower(facilityId);
+                    batteryFacilityEnergy += power * count;
+                }
             }
 
-            document.getElementById('results').classList.add('show');
+            const totalEnergyWithBatteries = totalEnergy + batteryFacilityEnergy;
+            bestGenerator = findBestGenerator(totalEnergyWithBatteries, selectedRegion.id);
+
+            if (bestGenerator.gen && bestGenerator.gen.battery !== 'originium_ore') {
+                batteryFacilities = calcFacilitiesNeeded(bestGenerator.gen.battery, bestGenerator.info.batteriesPerMin);
+                batteryFacilityEnergy = 0;
+                for (const [facilityId, count] of Object.entries(batteryFacilities)) {
+                    const power = getFacilityPower(facilityId);
+                    batteryFacilityEnergy += power * count;
+                }
+            }
+
+            totalEnergy = totalEnergyWithBatteries;
+
+            const newBatteryCost = bestGenerator.info.oreCost;
+
+            const costChanged =
+                Math.abs(newBatteryCost.originium_ore - batteryOreCost.originium_ore) > 1 ||
+                Math.abs(newBatteryCost.amethyst_ore - batteryOreCost.amethyst_ore) > 1 ||
+                Math.abs(newBatteryCost.ferrite_ore - batteryOreCost.ferrite_ore) > 1;
+
+            batteryOreCost = { ...newBatteryCost };
+
+            if (!costChanged || iterations >= MAX_ITERATIONS) {
+                break;
+            }
         }
+
+        const totalOreForBatteries = batteryOreCost.originium_ore + batteryOreCost.amethyst_ore + batteryOreCost.ferrite_ore;
+
+        const netBonds = totalBondsPerMin - (bestGenerator?.info?.lostBonds || 0);
+
+        document.getElementById('totalBonds').innerHTML =
+            `${netBonds.toFixed(1)} <span style="font-size:18px;color:#4fc3f7">обл/мин (чистая прибыль)</span>`;
+
+        const craftList = document.getElementById('craftList');
+        let craftHtml = '';
+
+        for (const d of details) {
+            let facInfo = '';
+            if (d.facilities && Object.keys(d.facilities).length > 0) {
+                const facList = Object.entries(d.facilities)
+                    .map(([f, c]) => `${FACILITY_NAMES[f] || f}: ${c}`)
+                    .join(', ');
+                facInfo = `<div style="font-size:11px;color:#888;margin-top:3px">${facList}</div>`;
+            }
+            craftHtml += `<div class="item-card">
+                <span class="name">${d.name}${facInfo}</span>
+                <span class="bonds">${d.rate.toFixed(2)}/мин = ${d.bondsPerMin.toFixed(1)} обл/мин</span>
+            </div>`;
+        }
+
+        if (bestGenerator && bestGenerator.gen && bestGenerator.gen.battery !== 'originium_ore') {
+            let batteryName = bestGenerator.gen.battery;
+            for (const facility of allRecipes) {
+                for (const recipe of facility.recipes) {
+                    if (recipe.output[0].item === bestGenerator.gen.battery) {
+                        batteryName = recipe.output[0].name_ru;
+                        break;
+                    }
+                }
+            }
+            let batteryFacInfo = '';
+            if (Object.keys(batteryFacilities).length > 0) {
+                const facList = Object.entries(batteryFacilities)
+                    .map(([f, c]) => `${FACILITY_NAMES[f] || f}: ${c}`)
+                    .join(', ');
+                batteryFacInfo = `<div style="font-size:11px;color:#888;margin-top:3px">${facList}</div>`;
+            }
+            craftHtml += `<div class="item-card" style="border-left-color:#ff6600">
+                <span class="name">${batteryName} (генератор)${batteryFacInfo}</span>
+                <span class="bonds" style="color:#ff9800">${bestGenerator.info.batteriesPerMin.toFixed(2)}/мин</span>
+            </div>`;
+        }
+
+        const baseOutputs = selectedRegion.base_outputs || 0;
+        const outpostOutputs = selectedRegion.outposts.reduce((sum, o) => sum + (o.outputs || 0), 0);
+        const totalOutputs = baseOutputs + outpostOutputs;
+        const outputsRemaining = totalOutputs - oreLines.total;
+
+        craftHtml += `<div class="ore-lines-panel">
+            <h3>⛏️ Входные линии руды (конвейер ${CONVEYOR_SPEED}/мин)</h3>
+            <div class="ore-lines-grid">
+                <div class="ore-line-box">
+                    <div class="icon">🟡</div>
+                    <div class="label">Ориджиний</div>
+                    <div class="value">${oreLines.originium}</div>
+                    <div class="rate">${usedOreByType.originium.toFixed(0)}/мин</div>
+                </div>
+                <div class="ore-line-box">
+                    <div class="icon">🟣</div>
+                    <div class="label">Аметист</div>
+                    <div class="value">${oreLines.amethyst}</div>
+                    <div class="rate">${usedOreByType.amethyst.toFixed(0)}/мин</div>
+                </div>
+                <div class="ore-line-box">
+                    <div class="icon">🔵</div>
+                    <div class="label">Феррий</div>
+                    <div class="value">${oreLines.ferrite}</div>
+                    <div class="rate">${usedOreByType.ferrite.toFixed(0)}/мин</div>
+                </div>
+                <div class="ore-line-box total">
+                    <div class="icon">📦</div>
+                    <div class="label">ВСЕГО линий</div>
+                    <div class="value">${oreLines.total}</div>
+                    <div class="rate">${usedOrePerMin.toFixed(0)}/мин</div>
+                </div>
+            </div>
+            ${totalOutputs > 0 ? `<div class="area-summary" style="margin-top:12px">
+                <div class="area-box used">
+                    <div class="label">Занято выходов</div>
+                    <div class="value">${oreLines.total}</div>
+                </div>
+                <div class="area-box available">
+                    <div class="label">Доступно</div>
+                    <div class="value">${totalOutputs}</div>
+                    <div style="font-size:10px;color:#888;margin-top:2px">База: ${baseOutputs} + ${selectedRegion.outposts.length} аванп. × 16</div>
+                </div>
+                <div class="area-box ${outputsRemaining >= 0 ? 'remaining' : 'over'}">
+                    <div class="label">${outputsRemaining >= 0 ? 'Свободно' : 'Не хватает!'}</div>
+                    <div class="value">${Math.abs(outputsRemaining)}</div>
+                </div>
+            </div>` : ''}
+        </div>`;
+
+        if (Object.keys(totalFacilities).length > 0 || Object.keys(batteryFacilities).length > 0) {
+            let totalEffectiveArea = 0;
+            let tableRows = '';
+
+            for (const [f, c] of Object.entries(totalFacilities)) {
+                const size = getFacilitySize(f);
+                const parts = size.split('x');
+                const effSize = parts.length === 2 ? `${parts[0]}×${parseInt(parts[1])+1}` : size;
+                const effArea = getEffectiveArea(f);
+                const subtotal = effArea * c;
+                totalEffectiveArea += subtotal;
+                tableRows += `<tr>
+                    <td>${FACILITY_NAMES[f] || f}</td>
+                    <td class="size">${effSize}</td>
+                    <td class="number">${c}</td>
+                    <td class="area">${subtotal}</td>
+                </tr>`;
+            }
+
+            for (const [f, c] of Object.entries(batteryFacilities)) {
+                const size = getFacilitySize(f);
+                const parts = size.split('x');
+                const effSize = parts.length === 2 ? `${parts[0]}×${parseInt(parts[1])+1}` : size;
+                const effArea = getEffectiveArea(f);
+                const subtotal = effArea * c;
+                totalEffectiveArea += subtotal;
+                tableRows += `<tr class="battery-row">
+                    <td>🔋 ${FACILITY_NAMES[f] || f}</td>
+                    <td class="size">${effSize}</td>
+                    <td class="number">${c}</td>
+                    <td class="area">${subtotal}</td>
+                </tr>`;
+            }
+
+            if (bestGenerator && bestGenerator.gen) {
+                const genSize = bestGenerator.gen.size;
+                const genParts = genSize.split('x');
+                const genEffSize = genParts.length === 2 ? `${genParts[0]}×${parseInt(genParts[1])+1}` : genSize;
+                const genEffArea = getEffectiveAreaFromSize(bestGenerator.gen.size) * bestGenerator.info.generatorsNeeded;
+                totalEffectiveArea += genEffArea;
+                tableRows += `<tr class="gen-row">
+                    <td>⚡ ${bestGenerator.gen.name} (${bestGenerator.gen.batteryName})</td>
+                    <td class="size">${genEffSize}</td>
+                    <td class="number">${bestGenerator.info.generatorsNeeded}</td>
+                    <td class="area">${genEffArea}</td>
+                </tr>`;
+            }
+
+            const pylonsNeeded = Math.ceil(totalEffectiveArea / PYLON_COVERAGE);
+            const pylonArea = pylonsNeeded * PYLON_SIZE;
+            totalEffectiveArea += pylonArea;
+
+            tableRows += `<tr style="color:#9c27b0">
+                <td>🔌 Пилоны (12×12 зона)</td>
+                <td class="size">2×2</td>
+                <td class="number">${pylonsNeeded}</td>
+                <td class="area">${pylonArea}</td>
+            </tr>`;
+
+            const plotCount = 1 + selectedRegion.outposts.length;
+            const blockedByStructures = plotCount * PLOT_BLOCKED_AREA;
+            const grossArea = selectedRegion.base_area + selectedRegion.outposts.reduce((sum, o) => sum + o.area, 0);
+            const availableArea = grossArea - blockedByStructures;
+            const remainingArea = availableArea - totalEffectiveArea;
+
+            craftHtml += `<div class="facilities-panel">
+                <h3>🏭 Станки и площадь</h3>
+                <table class="facilities-table">
+                    <thead>
+                        <tr><th>Станок</th><th style="text-align:center">Размер</th><th style="text-align:center">Кол-во</th><th style="text-align:right">Площадь</th></tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                        <tr class="total-row">
+                            <td colspan="3">ИТОГО (с лентами)</td>
+                            <td class="area">${totalEffectiveArea} тайлов</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="area-summary">
+                    <div class="area-box used">
+                        <div class="label">Занято (эфф.)</div>
+                        <div class="value">${totalEffectiveArea}</div>
+                    </div>
+                    <div class="area-box available">
+                        <div class="label">Доступно</div>
+                        <div class="value">${availableArea}</div>
+                        <div style="font-size:10px;color:#888;margin-top:2px">${grossArea} − ${plotCount}×81</div>
+                    </div>
+                    <div class="area-box ${remainingArea >= 0 ? 'remaining' : 'over'}">
+                        <div class="label">${remainingArea >= 0 ? 'Свободно' : 'Не хватает!'}</div>
+                        <div class="value">${Math.abs(remainingArea)}</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        if (bestGenerator && bestGenerator.gen) {
+            craftHtml += `<div class="info" style="margin-top:10px;background:rgba(255,100,0,0.15);border-left-color:#ff6600">
+                <b>Руда на батареи:</b> ${totalOreForBatteries.toFixed(0)}/мин
+                (Ориджиний: ${batteryOreCost.originium_ore.toFixed(0)},
+                 Аметист: ${batteryOreCost.amethyst_ore.toFixed(0)},
+                 Феррий: ${batteryOreCost.ferrite_ore.toFixed(0)})
+            </div>`;
+
+            let facilityRows = facilityEnergyDetails.map(f =>
+                `<div class="energy-row" style="padding-left:20px;font-size:13px">
+                    <span class="label">${f.name} (${f.count} × ${f.power})</span>
+                    <span class="value">${f.energy}</span>
+                </div>`
+            ).join('');
+
+            let batteryFacilityRows = '';
+            if (batteryFacilityEnergy > 0) {
+                batteryFacilityRows = Object.entries(batteryFacilities).map(([facilityId, count]) => {
+                    const power = getFacilityPower(facilityId);
+                    const energy = power * count;
+                    if (energy > 0) {
+                        return `<div class="energy-row" style="padding-left:20px;font-size:13px">
+                            <span class="label">${FACILITY_NAMES[facilityId] || facilityId} (${count} × ${power}) [батареи]</span>
+                            <span class="value">${energy}</span>
+                        </div>`;
+                    }
+                    return '';
+                }).join('');
+            }
+
+            craftHtml += `
+            <div class="energy-panel">
+                <h3>⚡ Энергопотребление (итерация ${iterations})</h3>
+                <div class="energy-row">
+                    <span class="label">🔨 Буры (${drillsNeeded} шт × ${DRILL_POWER} кВт)</span>
+                    <span class="value">${drillEnergy} кВт</span>
+                </div>
+                <div class="energy-row">
+                    <span class="label">💧 Насосы (${pumpsNeeded} шт × ${PUMP_POWER} кВт)</span>
+                    <span class="value">${pumpEnergy} кВт</span>
+                </div>
+                <div class="energy-row">
+                    <span class="label">🏭 Станки (товары)</span>
+                    <span class="value">${facilityEnergy} кВт</span>
+                </div>
+                ${facilityRows}
+                <div class="energy-row">
+                    <span class="label">🔋 Станки (батареи)</span>
+                    <span class="value">${batteryFacilityEnergy} кВт</span>
+                </div>
+                ${batteryFacilityRows}
+                <div class="energy-total">
+                    ИТОГО: ${totalEnergy} кВт
+                </div>
+                <h3 style="margin-top:15px">🔋 Лучший генератор</h3>
+                <div style="background:rgba(0,255,0,0.15);border-radius:8px;padding:12px;margin:5px 0">
+                    <div class="energy-row" style="border:none">
+                        <span class="label" style="font-size:16px">✅ ${bestGenerator.gen.name} (${bestGenerator.gen.batteryName})</span>
+                        <span class="value">${bestGenerator.info.generatorsNeeded} шт × ${bestGenerator.gen.energy} кВт</span>
+                    </div>
+                    <div style="margin-top:8px;font-size:13px;color:#aaa">
+                        ${bestGenerator.gen.batteryName}: <b style="color:#ff9800">${bestGenerator.info.batteriesPerMin.toFixed(1)}/мин</b> |
+                        Руды на батареи: <b style="color:#ffaa00">${totalOreForBatteries.toFixed(0)}/мин</b>
+                    </div>
+                    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);text-align:center">
+                        <span style="color:#4fc3f7;font-size:20px;font-weight:bold">ЧИСТАЯ ПРИБЫЛЬ: ${netBonds.toFixed(0)} обл/мин</span>
+                    </div>
+                </div>
+            </div>`;
+
+            console.log('=== Энергия ===');
+            console.log('Использовано руды/мин:', usedOrePerMin.toFixed(1));
+            console.log('Воды/мин:', totalWaterPerMin.toFixed(1));
+            console.log('Буров:', drillsNeeded, '=', drillEnergy, 'кВт');
+            console.log('Насосов:', pumpsNeeded, '=', pumpEnergy, 'кВт');
+            console.log('Станки товары:', facilityEnergy, 'кВт');
+            console.log('Станки батареи:', batteryFacilityEnergy, 'кВт');
+            console.log('Итого:', totalEnergy, 'кВт');
+        }
+
+        craftList.innerHTML = craftHtml || '<div style="color:#888">Нет ресурсов для крафта</div>';
+        document.getElementById('calcResult').style.display = 'block';
+    }
+
+    function renderAllRecipes() {
+        const tbody = document.querySelector('#allRecipesTable tbody');
+        let html = '';
+
+        for (const facility of allRecipes) {
+            for (const recipe of facility.recipes) {
+                if (recipe.bonds) {
+                    const inputs = recipe.input.map(i => `${i.amount} ${i.name_ru}`).join(' + ');
+                    const itemId = recipe.output[0].item;
+
+                    let locationInfo = '-';
+                    if (sellableData) {
+                        const locations = [];
+                        for (const region of sellableData.regions) {
+                            const outpostNames = [];
+                            for (const outpost of region.outposts) {
+                                if (outpost.items.some(i => i.item === itemId)) {
+                                    outpostNames.push(outpost.name);
+                                }
+                            }
+                            if (outpostNames.length > 0) {
+                                if (outpostNames.length === region.outposts.length) {
+                                    locations.push(`${region.name}: все`);
+                                } else {
+                                    locations.push(`${region.name}: ${outpostNames.join(', ')}`);
+                                }
+                            }
+                        }
+                        locationInfo = locations.length > 0 ? locations.join('; ') : '-';
+                    }
+
+                    html += `<tr>
+                        <td><input type="checkbox" class="recipe-checkbox" data-item="${itemId}" checked></td>
+                        <td>${recipe.output[0].name_ru}</td>
+                        <td style="color:#ffd700;font-weight:bold">${recipe.bonds}</td>
+                        <td style="font-size:12px">${locationInfo}</td>
+                        <td style="font-size:12px">${inputs}</td>
+                    </tr>`;
+                }
+            }
+        }
+        tbody.innerHTML = html;
+    }
+
+    loadData();
     </script>
 </body>
 </html>

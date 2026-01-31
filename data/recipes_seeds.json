@@ -1,6 +1,9 @@
 {
   "facility": "Модуль сбора семян",
   "facility_id": "seed_collector",
+  "power": 10,
+  "size": "5x5",
+  "area": 25,
   "recipes": [
     {
       "name": "Производство семени гречецвета",

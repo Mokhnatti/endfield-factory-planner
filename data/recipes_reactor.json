@@ -1,6 +1,9 @@
 {
   "facility": "Камера реактора",
   "facility_id": "reactor",
+  "power": 50,
+  "size": "5x5",
+  "area": 25,
   "recipes": [
     {
       "name": "Производство раствора цзиньцао (жидкости)",

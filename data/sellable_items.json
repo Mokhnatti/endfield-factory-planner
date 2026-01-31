@@ -1,0 +1,93 @@
+{
+  "regions": [
+    {
+      "id": "valley",
+      "name": "Долина",
+      "number": 1,
+      "base_size": "60x60",
+      "base_area": 3600,
+      "base_outputs": 39,
+      "outposts": [
+        {
+          "id": 1,
+          "name": "Аванпост 1",
+          "size": "40x40",
+          "area": 1600,
+          "outputs": 16,
+          "items": [
+            { "item": "buckwheat_capsule_a", "name_ru": "Гречекапсула [A]", "bonds": 70 },
+            { "item": "citrom_can_a", "name_ru": "Консервированный цитром [A]", "bonds": 70 },
+            { "item": "battery_be_valley", "name_ru": "Батарея BE Долины", "bonds": 70 },
+            { "item": "battery_ce_valley", "name_ru": "Батарея CE Долины", "bonds": 30 },
+            { "item": "buckwheat_capsule_b", "name_ru": "Гречекапсула [B]", "bonds": 27 },
+            { "item": "citrom_can_b", "name_ru": "Консервированный цитром [B]", "bonds": 27 },
+            { "item": "buckwheat_capsule_c", "name_ru": "Гречекапсула [C]", "bonds": 10 },
+            { "item": "citrom_can_c", "name_ru": "Консервированный цитром [C]", "bonds": 10 },
+            { "item": "amethyst_bottle", "name_ru": "Аметистовая бутылка", "bonds": 2 },
+            { "item": "origeode", "name_ru": "Ориджеода", "bonds": 1 },
+            { "item": "amethyst_part", "name_ru": "Аметистовая деталь", "bonds": 1 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Аванпост 2",
+          "size": "40x40",
+          "area": 1600,
+          "outputs": 16,
+          "items": [
+            { "item": "buckwheat_capsule_a", "name_ru": "Гречекапсула [A]", "bonds": 70 },
+            { "item": "citrom_can_a", "name_ru": "Консервированный цитром [A]", "bonds": 70 },
+            { "item": "battery_be_valley", "name_ru": "Батарея BE Долины", "bonds": 70 },
+            { "item": "battery_ce_valley", "name_ru": "Батарея CE Долины", "bonds": 30 },
+            { "item": "buckwheat_capsule_b", "name_ru": "Гречекапсула [B]", "bonds": 27 },
+            { "item": "citrom_can_b", "name_ru": "Консервированный цитром [B]", "bonds": 27 },
+            { "item": "battery_me_valley", "name_ru": "Батарея ME Долины", "bonds": 16 },
+            { "item": "buckwheat_capsule_c", "name_ru": "Гречекапсула [C]", "bonds": 10 },
+            { "item": "citrom_can_c", "name_ru": "Консервированный цитром [C]", "bonds": 10 },
+            { "item": "ferrite_part", "name_ru": "Ферриевая деталь", "bonds": 1 }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Аванпост 3",
+          "size": "40x40",
+          "area": 1600,
+          "outputs": 16,
+          "items": [
+            { "item": "buckwheat_capsule_a", "name_ru": "Гречекапсула [A]", "bonds": 70 },
+            { "item": "citrom_can_a", "name_ru": "Консервированный цитром [A]", "bonds": 70 },
+            { "item": "battery_be_valley", "name_ru": "Батарея BE Долины", "bonds": 70 },
+            { "item": "battery_ce_valley", "name_ru": "Батарея CE Долины", "bonds": 30 },
+            { "item": "buckwheat_capsule_b", "name_ru": "Гречекапсула [B]", "bonds": 27 },
+            { "item": "citrom_can_b", "name_ru": "Консервированный цитром [B]", "bonds": 27 },
+            { "item": "citrom_can_c", "name_ru": "Консервированный цитром [C]", "bonds": 10 },
+            { "item": "steel_part", "name_ru": "Стальная деталь", "bonds": 3 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ulin",
+      "name": "Улина",
+      "number": 2,
+      "base_size": "60x60",
+      "base_area": 3600,
+      "base_outputs": 16,
+      "outposts": [
+        {
+          "id": 1,
+          "name": "Аванпост 1",
+          "size": "40x40",
+          "area": 1600,
+          "outputs": 16,
+          "items": [
+            { "item": "battery_me_ulin", "name_ru": "Батарея ME Улина", "bonds": 25 },
+            { "item": "jinzao_drink", "name_ru": "Напиток с цзиньцао", "bonds": 16 },
+            { "item": "yazhen_injector_c", "name_ru": "Инъектор ячжэня [C]", "bonds": 16 },
+            { "item": "xiranite", "name_ru": "Ксиранит", "bonds": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

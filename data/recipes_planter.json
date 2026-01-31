@@ -1,6 +1,9 @@
 {
   "facility": "Модуль посадки",
   "facility_id": "planter",
+  "power": 20,
+  "size": "5x5",
+  "area": 25,
   "recipes": [
     {
       "name": "Производство гречецвета",

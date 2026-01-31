@@ -16,5 +16,17 @@
     "file": "bottles_simple.json",
     "author": "Claude",
     "description": "Простой пример: 4 очистки → 2 формовки = бутылки"
+  },
+  {
+    "name": "Семена (user)",
+    "file": "seeds_user.json",
+    "author": "User",
+    "description": "2 плантера + 1 сборщик семян = самодостаточная ферма"
+  },
+  {
+    "name": "Молотый песчанолист (Claude)",
+    "file": "sandleaf_powder_claude.json",
+    "author": "Claude",
+    "description": "2 плантера + 1 сборщик + 1 гриндер = молотый песчанолист"
   }
 ]
