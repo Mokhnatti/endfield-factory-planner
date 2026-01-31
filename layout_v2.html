@@ -381,6 +381,73 @@
         ctx.fillStyle = def.color;
         ctx.fillRect(x, y, w, h);
 
+        // Draw input/output zones as colored cells
+        const dotRadius = cellSize * 0.25;
+
+        // Input side (yellow/orange)
+        if (def.inputSide === 'left') {
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
+                ctx.fillRect(x, y + i * cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#fa0';
+                ctx.beginPath();
+                ctx.arc(x + cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (def.inputSide === 'top') {
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
+                ctx.fillRect(x + i * cellSize, y, cellSize, cellSize);
+                ctx.fillStyle = '#fa0';
+                ctx.beginPath();
+                ctx.arc(x + i * cellSize + cellSize/2, y + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (def.inputSide === 'any') {
+            // Storage - все стороны вход (жёлтые точки по периметру)
+            ctx.fillStyle = '#fa0';
+            for (let i = 0; i < def.w; i++) {
+                ctx.beginPath(); ctx.arc(x + i * cellSize + cellSize/2, y + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x + i * cellSize + cellSize/2, y + h - cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+            }
+            for (let i = 1; i < def.h - 1; i++) {
+                ctx.beginPath(); ctx.arc(x + cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x + w - cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        // Output side (green)
+        if (def.outputSide === 'right') {
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
+                ctx.fillRect(x + w - cellSize, y + i * cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#0c0';
+                ctx.beginPath();
+                ctx.arc(x + w - cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (def.outputSide === 'bottom') {
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
+                ctx.fillRect(x + i * cellSize, y + h - cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#0c0';
+                ctx.beginPath();
+                ctx.arc(x + i * cellSize + cellSize/2, y + h - cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (def.outputSide === 'any') {
+            // Drill/Pump - все стороны выход (зелёные точки по периметру)
+            ctx.fillStyle = '#0c0';
+            for (let i = 0; i < def.w; i++) {
+                ctx.beginPath(); ctx.arc(x + i * cellSize + cellSize/2, y + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x + i * cellSize + cellSize/2, y + h - cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+            }
+            for (let i = 1; i < def.h - 1; i++) {
+                ctx.beginPath(); ctx.arc(x + cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x + w - cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
         // Border
         ctx.strokeStyle = 'rgba(255,255,255,0.5)';
         ctx.lineWidth = 2;
@@ -392,19 +459,6 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(def.name, x + w/2, y + h/2);
-
-        // Input/Output indicators
-        ctx.font = `${Math.max(6, cellSize * 0.6)}px sans-serif`;
-        if (def.inputSide === 'left') {
-            ctx.fillText('←', x + cellSize/2, y + h/2);
-        } else if (def.inputSide === 'top') {
-            ctx.fillText('↓', x + w/2, y + cellSize/2);
-        }
-        if (def.outputSide === 'right') {
-            ctx.fillText('→', x + w - cellSize/2, y + h/2);
-        } else if (def.outputSide === 'bottom') {
-            ctx.fillText('↓', x + w/2, y + h - cellSize/2);
-        }
 
         // Pylon coverage
         if (f.type === 'pylon' && def.coverage) {
@@ -495,12 +549,75 @@
         return true;
     }
 
+    // Determine auto-direction for conveyor based on adjacent facilities/edges
+    function getAutoDirection(x, y) {
+        // Check edge output zones (resources come FROM edge INTO map)
+        if (y === 0) return 'd'; // Top edge - go down
+        if (x === 0) return 'r'; // Left edge - go right
+
+        // Check adjacent facilities
+        for (const f of facilities) {
+            const def = FACILITIES[f.type];
+            if (!def.inputSide && !def.outputSide) continue;
+
+            // Check if conveyor is adjacent to facility OUTPUT (conveyor goes AWAY)
+            if (def.outputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
+                return 'r'; // Exit to the right
+            }
+            if (def.outputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
+                return 'd'; // Exit downward
+            }
+            if (def.outputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
+                return 'l'; // Exit to the left
+            }
+            if (def.outputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
+                return 'u'; // Exit upward
+            }
+
+            // Check if conveyor is adjacent to facility INPUT (conveyor goes TOWARD)
+            if (def.inputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
+                return 'r'; // Enter from left
+            }
+            if (def.inputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
+                return 'd'; // Enter from top
+            }
+            if (def.inputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
+                return 'l'; // Enter from right
+            }
+            if (def.inputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
+                return 'u'; // Enter from bottom
+            }
+
+            // Storage (any side = input) - point toward storage
+            if (def.inputSide === 'any') {
+                if (x === f.x - 1 && y >= f.y && y < f.y + def.h) return 'r';
+                if (x === f.x + def.w && y >= f.y && y < f.y + def.h) return 'l';
+                if (y === f.y - 1 && x >= f.x && x < f.x + def.w) return 'd';
+                if (y === f.y + def.h && x >= f.x && x < f.x + def.w) return 'u';
+            }
+
+            // Drill/Pump (any side = output) - point away
+            if (def.outputSide === 'any') {
+                if (x === f.x - 1 && y >= f.y && y < f.y + def.h) return 'l';
+                if (x === f.x + def.w && y >= f.y && y < f.y + def.h) return 'r';
+                if (y === f.y - 1 && x >= f.x && x < f.x + def.w) return 'u';
+                if (y === f.y + def.h && x >= f.x && x < f.x + def.w) return 'd';
+            }
+        }
+
+        return null; // No auto-direction
+    }
+
     function placeConveyor(x, y, dir) {
         if (!canPlaceConveyor(x, y)) return false;
 
+        // Try auto-direction first
+        const autoDir = getAutoDirection(x, y);
+        const finalDir = autoDir || dir;
+
         // Remove existing conveyor at position
         conveyors = conveyors.filter(c => !(c.x === x && c.y === y));
-        conveyors.push({ x, y, dir });
+        conveyors.push({ x, y, dir: finalDir });
         render();
         return true;
     }
