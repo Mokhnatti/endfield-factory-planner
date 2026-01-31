@@ -1212,14 +1212,24 @@
 
         // 4. Check pylons not on facilities or conveyors
         for (const p of pylons) {
+            // Check each tile of the 2x2 pylon
             for (let dy = 0; dy < 2; dy++) {
                 for (let dx = 0; dx < 2; dx++) {
-                    const flags = getTileFlags(p.x + dx, p.y + dy);
-                    if (flags.includes('F') && !(p.x + dx >= p.x && p.x + dx < p.x + 2 && p.y + dy >= p.y && p.y + dy < p.y + 2)) {
-                        errors.push(`❌ ПИЛОН НА СТАНКЕ: (${p.x},${p.y})`);
+                    const tileX = p.x + dx;
+                    const tileY = p.y + dy;
+
+                    // Check if this pylon tile overlaps with any OTHER facility
+                    for (const f of facilities) {
+                        if (f === p) continue; // Skip self
+                        const def = FACILITIES[f.type];
+                        if (tileX >= f.x && tileX < f.x + def.w && tileY >= f.y && tileY < f.y + def.h) {
+                            errors.push(`❌ ПИЛОН ПЕРЕСЕКАЕТ СТАНОК: Пилон (${p.x},${p.y}) пересекает ${f.type} (${f.x},${f.y}) в точке (${tileX},${tileY})`);
+                        }
                     }
-                    if (flags.includes('C')) {
-                        errors.push(`❌ ПИЛОН НА КОНВЕЙЕРЕ: (${p.x},${p.y}) - конвейер на (${p.x+dx},${p.y+dy})`);
+
+                    // Check if pylon is on conveyor
+                    if (conveyors.some(c => c.x === tileX && c.y === tileY)) {
+                        errors.push(`❌ ПИЛОН НА КОНВЕЙЕРЕ: Пилон (${p.x},${p.y}) на конвейере (${tileX},${tileY})`);
                     }
                 }
             }
