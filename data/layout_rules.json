@@ -1,0 +1,299 @@
+{
+  "observations_from_screenshots": {
+    "date": "2026-01-31",
+    "key_findings": [
+      "Станки имеют вход СЛЕВА (<) и выход СПРАВА (>)",
+      "Также: вход СВЕРХУ (^), выход СНИЗУ (v)",
+      "ВСЯ ГРАНЬ станка = входы/выходы (3x3 = 3 входа, 3 выхода; 6x4 = 6 входов)",
+      "НЕ СЛИВАЕМ ленты (скорость падает!) - каждая лента в СВОЙ вход",
+      "Станки одного типа ставятся в ряды вплотную или с промежутком",
+      "Пилоны (круг с антенной) ставятся между группами станков, НЕ на конвейерах"
+    ],
+    "critical_rule": "ВСЁ ДОЛЖНО БЫТЬ СВЯЗАНО! Конвейеры образуют непрерывную сеть от входа до выхода",
+    "io_symbols": {
+      "<": "вход слева",
+      ">": "выход справа",
+      "^": "вход сверху",
+      "v": "выход снизу"
+    },
+    "io_counts": {
+      "3x3": { "inputs": 3, "outputs": 3 },
+      "5x5": { "inputs": 5, "outputs": 5 },
+      "6x4": { "inputs": 6, "outputs": 4 }
+    }
+  },
+  "conveyor_connection_rules": {
+    "principle": "Конвейер - это ПУТЬ для предметов. Каждый станок должен быть подключён.",
+    "connection_types": [
+      {
+        "name": "Прямой конвейер",
+        "pattern": "→→→→→",
+        "use": "Прямая линия между точками",
+        "color": "жёлтый"
+      },
+      {
+        "name": "Поворот 90°",
+        "pattern": "→→↓ или ↓←← и т.д.",
+        "use": "Смена направления",
+        "color": "жёлтый полукруг"
+      },
+      {
+        "name": "Мост (Bridge)",
+        "pattern": "Чёрный квадрат 1x1",
+        "use": "Пересечение двух лент БЕЗ смешивания потоков",
+        "color": "чёрный",
+        "notes": "Одна лента проходит ПОД мостом, другая НАД - потоки не смешиваются"
+      }
+    ],
+    "bridge_rules": {
+      "description": "Мост позволяет двум лентам пересечься без взаимодействия",
+      "use_case": "Когда нужно провести ленту через другую ленту",
+      "visual": [
+        "→→→[мост]→→→  (лента идёт прямо)",
+        "     ↓",
+        "     ↓        (другая лента проходит под/над мостом)",
+        "     ↓"
+      ]
+    },
+    "valid_chain": "Склад → Лента → Станок1 → Лента → Станок2 → ... → Экспорт",
+    "invalid": "Станок без подключённой ленты = не работает"
+  },
+  "facilities": {
+    "furnace": {
+      "id": "furnace",
+      "name_ru": "Очистка",
+      "size": [3, 3],
+      "input_side": "left",
+      "output_side": "right",
+      "input_count": 3,
+      "output_count": 3,
+      "notes": "Вся левая грань = 3 входа, вся правая грань = 3 выхода"
+    },
+    "grinder": {
+      "id": "grinder",
+      "name_ru": "Перемалывание",
+      "size": [3, 3],
+      "input_side": "left",
+      "output_side": "right",
+      "input_count": 3,
+      "output_count": 3,
+      "notes": "Вся левая грань = 3 входа, вся правая грань = 3 выхода"
+    },
+    "shaping": {
+      "id": "shaping",
+      "name_ru": "Формовка",
+      "size": [3, 3],
+      "input_side": "left",
+      "output_side": "right",
+      "input_count": 3,
+      "output_count": 3,
+      "notes": "Вся левая грань = 3 входа, вся правая грань = 3 выхода"
+    },
+    "filling": {
+      "id": "filling",
+      "name_ru": "Наполнение",
+      "size": [6, 4],
+      "input_side": "top",
+      "output_side": "bottom",
+      "input_count": 6,
+      "output_count": 4,
+      "notes": "Вся верхняя грань (6 тайлов) = входы, нижняя (4 тайла) = выходы"
+    },
+    "thickener": {
+      "id": "thickener",
+      "name_ru": "Измельчение",
+      "size": [6, 4],
+      "input_side": "top",
+      "output_side": "bottom",
+      "input_count": 6,
+      "output_count": 4,
+      "notes": "Вся верхняя грань (6 тайлов) = входы, нижняя (4 тайла) = выходы"
+    },
+    "planter": {
+      "id": "planter",
+      "name_ru": "Посадка",
+      "size": [5, 5],
+      "input_side": "top",
+      "input_tile": "middle",
+      "output_side": "bottom",
+      "output_tile": "middle",
+      "input_count": 1,
+      "output_count": 1,
+      "notes": "Вход семян сверху, выход растений снизу"
+    },
+    "seed_collector": {
+      "id": "seed_collector",
+      "name_ru": "Сбор семян",
+      "size": [5, 5],
+      "input_side": "top",
+      "input_tile": "middle",
+      "output_side": "bottom",
+      "output_tile": "middle",
+      "input_count": 1,
+      "output_count": 1,
+      "notes": "Вход растений сверху, выход семян снизу"
+    },
+    "pylon": {
+      "id": "pylon",
+      "name_ru": "Пилон",
+      "size": [2, 2],
+      "coverage": [12, 12],
+      "no_io": true
+    },
+    "drill": {
+      "id": "drill",
+      "name_ru": "Бур",
+      "size": [2, 2],
+      "output_side": "any",
+      "output_count": 1,
+      "notes": "Ставится на месторождение руды"
+    },
+    "pump": {
+      "id": "pump",
+      "name_ru": "Насос",
+      "size": [2, 2],
+      "output_side": "any",
+      "output_count": 1,
+      "notes": "Ставится на источник воды"
+    },
+    "storage": {
+      "id": "storage",
+      "name_ru": "Хранилище",
+      "size": [3, 3],
+      "input_side": "any",
+      "input_count": 1,
+      "output_count": 0,
+      "notes": "Конечная точка цепочки - сюда складывается готовый продукт"
+    }
+  },
+  "conveyor": {
+    "speed": 30,
+    "speed_unit": "items/min",
+    "width": 1,
+    "can_turn": true,
+    "can_cross_over": true,
+    "cross_notes": "Перекрёстки только на прямых участках, не на поворотах"
+  },
+  "layout_rules": {
+    "row_of_same_facilities": {
+      "description": "Ряд одинаковых станков с общей лентой",
+      "pattern": [
+        "Станки ставятся в ряд ВПЛОТНУЮ друг к другу (без зазора)",
+        "Общая входная лента проходит СЛЕВА от ряда",
+        "Общая выходная лента проходит СПРАВА от ряда",
+        "Лента 'раздаёт' материал на все станки автоматически"
+      ],
+      "example": "7 очисток в ряд ← одна входная лента руды",
+      "visual": [
+        "[лента] → [станок][станок][станок][станок] → [лента]",
+        "   ↓         ↓       ↓       ↓       ↓         ↓",
+        " вход     общий вход для всех          общий выход"
+      ]
+    },
+    "merge": {
+      "description": "НЕ РЕКОМЕНДУЕТСЯ! Лучше использовать несколько входов станка",
+      "warning": "При слиянии скорость падает! Лучше вести отдельные ленты в разные входы",
+      "pattern": [
+        "Одна лента идёт ПРЯМО",
+        "Вторая лента ПОВОРАЧИВАЕТ и входит в первую",
+        "Точка слияния = поворотный элемент"
+      ],
+      "better_approach": [
+        "Станок 3x3 имеет 3 входа - используй их!",
+        "2 очистки → 2 отдельные ленты → 2 входа формовки",
+        "Не сливай, а направляй в разные входы"
+      ]
+    },
+    "split": {
+      "description": "Разделение 1 ленты на 2+",
+      "pattern": [
+        "Главная лента идёт прямо",
+        "Отводы уходят через повороты",
+        "Можно делать несколько отводов подряд"
+      ],
+      "visual": [
+        "[вход]→→→→●→→→→→→→[выход1]",
+        "          ↓",
+        "          ↓",
+        "       [выход2]"
+      ]
+    },
+    "conveyor_to_facility": {
+      "description": "Подключение ленты к станку",
+      "pattern": [
+        "Лента подходит к СРЕДНЕМУ тайлу стороны станка",
+        "Для 3x3: средний тайл = позиция 1 (из 0,1,2)",
+        "Для 6x4: средний тайл короткой стороны"
+      ]
+    },
+    "pylon_coverage": {
+      "description": "Все станки должны быть в зоне пилона",
+      "zone": "12x12 вокруг пилона",
+      "notes": "Пилон ставится между группами станков, может покрывать 2-3 ряда"
+    }
+  },
+  "production_chains": {
+    "citrom_can_c": {
+      "name_ru": "Консервированный цитром [C]",
+      "steps": [
+        {
+          "input": "amethyst_ore",
+          "facility": "furnace",
+          "output": "amethyst_fiber",
+          "ratio": "1:1",
+          "facilities_needed": 2,
+          "notes": "2 очистки для 60/мин волокна"
+        },
+        {
+          "input": "amethyst_fiber",
+          "facility": "shaping",
+          "output": "amethyst_bottle",
+          "ratio": "2:1",
+          "facilities_needed": 1,
+          "notes": "1 формовка, берёт с 2 очисток"
+        },
+        {
+          "input": "citrom_seed",
+          "facility": "planter",
+          "output": "citrom",
+          "ratio": "1:1",
+          "facilities_needed": 1
+        },
+        {
+          "input": "citrom",
+          "facility": "seed_collector",
+          "output": "citrom_seed",
+          "ratio": "1:2",
+          "facilities_needed": 1,
+          "notes": "Цикл: половина цитрома идёт сюда"
+        },
+        {
+          "input": "citrom",
+          "facility": "grinder",
+          "output": "citrom_powder",
+          "ratio": "1:2",
+          "facilities_needed": 1,
+          "notes": "Вторая половина цитрома"
+        },
+        {
+          "input": ["amethyst_bottle", "citrom_powder"],
+          "facility": "filling",
+          "output": "citrom_can_c",
+          "ratio": "5+5:1",
+          "facilities_needed": 1,
+          "notes": "2 входа: бутылки и порошок"
+        }
+      ],
+      "flow_diagram": [
+        "amethyst_ore ─→ [furnace×2] ─┬─→ [shaping] ─→ amethyst_bottle ─┐",
+        "                             └───────────────────────────────────┤",
+        "                                                                 ↓",
+        "citrom_seed ←─┬─ [seed_collector] ←─┬─ citrom ←─ [planter] ←─ citrom_seed",
+        "              │                     │",
+        "              └─→ [planter] ────────┘",
+        "                     ↓",
+        "              citrom ─→ [grinder] ─→ citrom_powder ─→ [filling] ─→ citrom_can_c"
+      ]
+    }
+  }
+}

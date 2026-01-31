@@ -1,0 +1,31 @@
+{
+  "name": "Бутылки (user)",
+  "author": "User",
+  "date": "2026-01-31",
+  "description": "4 очистки → 2 формовки → хранилище",
+  "facilities": [
+    { "type": "furnace", "x": 57, "y": 2 },
+    { "type": "furnace", "x": 54, "y": 2 },
+    { "type": "furnace", "x": 51, "y": 2 },
+    { "type": "furnace", "x": 48, "y": 2 },
+    { "type": "shaping", "x": 55, "y": 6 },
+    { "type": "shaping", "x": 50, "y": 6 },
+    { "type": "pylon", "x": 53, "y": 6 },
+    { "type": "storage", "x": 50, "y": 10 }
+  ],
+  "conveyors": [
+    { "x": 58, "y": 1, "dir": "r" },
+    { "x": 55, "y": 1, "dir": "r" },
+    { "x": 52, "y": 1, "dir": "r" },
+    { "x": 49, "y": 1, "dir": "r" },
+    { "x": 50, "y": 5, "dir": "r" },
+    { "x": 52, "y": 5, "dir": "r" },
+    { "x": 56, "y": 5, "dir": "r" },
+    { "x": 57, "y": 5, "dir": "r" },
+    { "x": 50, "y": 9, "dir": "r" },
+    { "x": 55, "y": 9, "dir": "r" },
+    { "x": 54, "y": 9, "dir": "l" },
+    { "x": 53, "y": 9, "dir": "l" },
+    { "x": 52, "y": 9, "dir": "l" }
+  ]
+}

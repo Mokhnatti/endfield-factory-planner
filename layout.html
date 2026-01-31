@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endfield - Редактор базы</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+        .sidebar h2 {
+            color: #4fc3f7;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #4fc3f7;
+            padding-bottom: 5px;
+        }
+        .sidebar h3 {
+            color: #ffd700;
+            font-size: 14px;
+            margin: 15px 0 8px;
+        }
+        .tool-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border: 1px solid #555;
+            background: rgba(255,255,255,0.05);
+            color: #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #888;
+        }
+        .tool-btn.active {
+            background: rgba(79,195,247,0.2);
+            border-color: #4fc3f7;
+            color: #4fc3f7;
+        }
+        .tool-btn .size {
+            float: right;
+            color: #888;
+            font-size: 11px;
+        }
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+        .facility-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .toolbar {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .toolbar button {
+            padding: 6px 12px;
+            border: 1px solid #555;
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .toolbar button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .toolbar .info {
+            margin-left: auto;
+            font-size: 13px;
+            color: #888;
+        }
+        .grid-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #16213e;
+        }
+        .grid-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+        .grid {
+            display: grid;
+            gap: 0;
+            border: 2px solid #ffd700;
+        }
+        .cell {
+            width: 10px;
+            height: 10px;
+            background: #2a2a4a;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        .cell:hover {
+            background: rgba(79,195,247,0.3);
+        }
+        .cell.blocked {
+            background: #4a1a1a;
+            border-color: #5a2a2a;
+        }
+        .cell.output {
+            background: #1a3a1a;
+            border-color: #2a4a2a;
+        }
+        .cell.output-center {
+            background: #2a6a2a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="%23ffa"/></svg>') center/60% no-repeat;
+            border-color: #3a7a3a;
+        }
+        .cell.conveyor { background: #555; }
+        .cell.conveyor-r { background: #666 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><polygon points="2,2 8,5 2,8" fill="%23ffa"/></svg>') center/70% no-repeat; }
+        .cell.conveyor-l { background: #666 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><polygon points="8,2 2,5 8,8" fill="%23ffa"/></svg>') center/70% no-repeat; }
+        .cell.conveyor-d { background: #666 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><polygon points="2,2 5,8 8,2" fill="%23ffa"/></svg>') center/70% no-repeat; }
+        .cell.conveyor-u { background: #666 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><polygon points="2,8 5,2 8,8" fill="%23ffa"/></svg>') center/70% no-repeat; }
+        .cell.turn-rd { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M1,5 Q5,5 5,9" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-ld { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M9,5 Q5,5 5,9" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-ru { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M1,5 Q5,5 5,1" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-lu { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M9,5 Q5,5 5,1" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        /* Дополнительные повороты: вход сверху/снизу, выход влево/вправо */
+        .cell.turn-dr { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M5,1 Q5,5 9,5" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-dl { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M5,1 Q5,5 1,5" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-ur { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M5,9 Q5,5 9,5" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.turn-ul { background: #555 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M5,9 Q5,5 1,5" stroke="%23ffa" fill="none" stroke-width="2"/></svg>') center/80% no-repeat; }
+        .cell.bridge { background: #222 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><line x1="0" y1="5" x2="10" y2="5" stroke="%23ffa" stroke-width="2"/><line x1="5" y1="0" x2="5" y2="10" stroke="%23888" stroke-width="2" stroke-dasharray="2,2"/></svg>') center/100% no-repeat; }
+        .cell.facility {
+            border-color: #4fc3f7;
+        }
+        .cell.planter { background: #2d5a2d; }
+        .cell.seed_collector { background: #4a7a2d; }
+        .cell.grinder { background: #5a5a2d; }
+        .cell.shaping { background: #5a3d2d; }
+        .cell.filling { background: #3d2d5a; }
+        .cell.furnace { background: #5a2d2d; }
+        .cell.thickener { background: #2d5a5a; }
+        .cell.pylon { background: #7a2d7a; border-color: #9a4d9a; }
+        .cell.drill { background: #5a4a2d; border-color: #7a6a4d; }
+        .cell.pump { background: #2d4a5a; border-color: #4d6a7a; }
+        .cell.storage { background: #5a5a3d; border-color: #7a7a5d; }
+
+        .facility-overlay {
+            position: absolute;
+            pointer-events: none;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 1px 1px 2px black;
+            font-weight: bold;
+        }
+        .pylon-coverage {
+            position: absolute;
+            pointer-events: none;
+            border: 2px dashed rgba(122,45,122,0.6);
+            background: rgba(122,45,122,0.08);
+            z-index: 5;
+        }
+
+        .legend {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+            font-size: 11px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #555;
+            border-radius: 2px;
+        }
+
+        .stats {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+        .stat-item {
+            display: flex;
+            gap: 5px;
+        }
+        .stat-item .label { color: #888; }
+        .stat-item .value { color: #ffd700; font-weight: bold; }
+
+        .preview {
+            position: fixed;
+            pointer-events: none;
+            border: 2px dashed #4fc3f7;
+            background: rgba(79,195,247,0.2);
+            z-index: 100;
+            display: none;
+        }
+        .preview.invalid {
+            border-color: #f44336;
+            background: rgba(244,67,54,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <h2>Инструменты</h2>
+
+            <button class="tool-btn active" data-tool="select">
+                Выбор / Удаление
+            </button>
+
+            <h3>Конвейеры</h3>
+            <button class="tool-btn" data-tool="conveyor-r">
+                → Лента вправо <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="conveyor-l">
+                ← Лента влево <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="conveyor-d">
+                ↓ Лента вниз <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="conveyor-u">
+                ↑ Лента вверх <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="turn-rd">
+                ┐ Поворот →↓ <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="turn-ld">
+                ┌ Поворот ←↓ <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="turn-ru">
+                ┘ Поворот →↑ <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="turn-lu">
+                └ Поворот ←↑ <span class="size">1x1</span>
+            </button>
+            <button class="tool-btn" data-tool="bridge">
+                ╬ Мост (пересечение) <span class="size">1x1</span>
+            </button>
+
+            <h3>Фермерство</h3>
+            <button class="tool-btn" data-tool="planter" data-size="5x5">
+                Посадка <span class="size">5x5</span>
+            </button>
+            <button class="tool-btn" data-tool="seed_collector" data-size="5x5">
+                Сбор семян <span class="size">5x5</span>
+            </button>
+
+            <h3>Обработка</h3>
+            <button class="tool-btn" data-tool="furnace" data-size="3x3">
+                Очистка <span class="size">3x3</span>
+            </button>
+            <button class="tool-btn" data-tool="grinder" data-size="3x3">
+                Перемалывание <span class="size">3x3</span>
+            </button>
+            <button class="tool-btn" data-tool="shaping" data-size="3x3">
+                Формовка <span class="size">3x3</span>
+            </button>
+            <button class="tool-btn" data-tool="thickener" data-size="6x4">
+                Измельчение <span class="size">6x4</span>
+            </button>
+            <button class="tool-btn" data-tool="filling" data-size="6x4">
+                Наполнение <span class="size">6x4</span>
+            </button>
+
+            <h3>Инфраструктура</h3>
+            <button class="tool-btn" data-tool="pylon" data-size="2x2">
+                Пилон <span class="size">2x2</span>
+            </button>
+            <button class="tool-btn" data-tool="drill" data-size="2x2">
+                Бур <span class="size">2x2</span>
+            </button>
+            <button class="tool-btn" data-tool="pump" data-size="2x2">
+                Насос <span class="size">2x2</span>
+            </button>
+            <button class="tool-btn" data-tool="storage" data-size="3x3">
+                Хранилище <span class="size">3x3</span>
+            </button>
+
+            <div class="legend">
+                <h3>Легенда</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background:#4a1a1a"></div>
+                    <span>Заблокировано (9x9)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background:#1a4a1a"></div>
+                    <span>Выходы руды (1x3)</span>
+                </div>
+            </div>
+
+            <div class="legend" style="margin-top:10px">
+                <h3>Цитром [C] цепочка:</h3>
+                <div style="font-size:10px;color:#aaa;line-height:1.6">
+                    1. Аметист.руда → Очистка<br>
+                    2. Волокно → Формовка<br>
+                    3. Бутылка → Наполнение<br>
+                    ---<br>
+                    4. Посадка ↔ Сбор семян<br>
+                    5. Цитром → Перемалывание<br>
+                    6. Порошок → Наполнение<br>
+                    ---<br>
+                    7. Наполнение → Экспорт
+                </div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div class="toolbar">
+                <button onclick="clearAll()">Очистить всё</button>
+                <button onclick="clearFacilities()">Удалить станки</button>
+                <button onclick="loadBuckCapsuleExample()" style="background:#5a5a2d;border-color:#7a7a3d">Пример: Гречецвет</button>
+                <button onclick="loadBottlesExample()" style="background:#5a3d2d;border-color:#7a5d4d">Пример: Бутылки</button>
+                <button onclick="zoomIn()">+</button>
+                <button onclick="zoomOut()">-</button>
+                <span style="color:#666">|</span>
+                <button onclick="exportLayout()" style="background:#2d5a5a;border-color:#4d7a7a">Экспорт JSON</button>
+                <button onclick="importLayout()" style="background:#5a2d5a;border-color:#7a4d7a">Импорт JSON</button>
+                <select id="savedLayouts" onchange="loadSavedLayout(this.value)" style="padding:6px;background:#333;color:#ccc;border:1px solid #555;border-radius:4px">
+                    <option value="">Загрузить схему...</option>
+                </select>
+                <span class="info">ЛКМ - поставить | ПКМ - удалить | Колёсико - масштаб</span>
+            </div>
+
+            <div class="grid-container" id="gridContainer">
+                <div class="grid-wrapper">
+                    <div class="grid" id="grid"></div>
+                </div>
+            </div>
+
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <span class="label">Площадь:</span>
+                    <span class="value" id="statArea">0 / 3519</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Станков:</span>
+                    <span class="value" id="statFacilities">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Конвейеров:</span>
+                    <span class="value" id="statConveyors">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Пилонов:</span>
+                    <span class="value" id="statPylons">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview" id="preview"></div>
+
+    <script>
+    const GRID_SIZE = 60;
+    const BLOCKED_SIZE = 9;
+    const OUTPUT_SIZE = 3;
+    const CELL_SIZE = 10;
+
+    const FACILITIES = {
+        planter: { w: 5, h: 5, name: 'Посадка', color: '#2d5a2d', input: 'top', output: 'bottom' },
+        seed_collector: { w: 5, h: 5, name: 'Семена', color: '#4a7a2d', input: 'top', output: 'bottom' },
+        grinder: { w: 3, h: 3, name: 'Молотилка', color: '#5a5a2d', input: 'left', output: 'right' },
+        shaping: { w: 3, h: 3, name: 'Формовка', color: '#5a3d2d', input: 'left', output: 'right' },
+        filling: { w: 6, h: 4, name: 'Наполнение', color: '#3d2d5a', input: 'top2', output: 'bottom' },
+        furnace: { w: 3, h: 3, name: 'Очистка', color: '#5a2d2d', input: 'left', output: 'right' },
+        thickener: { w: 6, h: 4, name: 'Измельчение', color: '#2d5a5a', input: 'top2', output: 'bottom' },
+        pylon: { w: 2, h: 2, name: 'Пилон', color: '#7a2d7a' },
+        drill: { w: 2, h: 2, name: 'Бур', color: '#5a4a2d', output: 'any' },
+        pump: { w: 2, h: 2, name: 'Насос', color: '#2d4a5a', output: 'any' },
+        storage: { w: 3, h: 3, name: 'Хранилище', color: '#5a5a3d', input: 'any' }
+    };
+
+    let grid = [];
+    let facilities = [];
+    let currentTool = 'select';
+    let cellSize = 8;
+    let isDragging = false;
+
+    function initGrid() {
+        const gridEl = document.getElementById('grid');
+        gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, ${cellSize}px)`;
+        gridEl.innerHTML = '';
+        grid = [];
+
+        for (let y = 0; y < GRID_SIZE; y++) {
+            grid[y] = [];
+            for (let x = 0; x < GRID_SIZE; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.x = x;
+                cell.dataset.y = y;
+                cell.style.width = cellSize + 'px';
+                cell.style.height = cellSize + 'px';
+
+                const isBlocked = x >= (GRID_SIZE - BLOCKED_SIZE) / 2 &&
+                                  x < (GRID_SIZE + BLOCKED_SIZE) / 2 &&
+                                  y >= (GRID_SIZE - BLOCKED_SIZE) / 2 &&
+                                  y < (GRID_SIZE + BLOCKED_SIZE) / 2;
+
+                let isOutput = false;
+                let isOutputCenter = false;
+                const OUTPUT_SPACING = 3;
+                const numOutputsPerEdge = Math.floor(GRID_SIZE / OUTPUT_SPACING);
+
+                for (let slot = 0; slot < numOutputsPerEdge; slot++) {
+                    const slotStart = slot * OUTPUT_SPACING;
+                    const slotMiddle = slotStart + 1;
+
+                    if (y === 0 && x >= slotStart && x < slotStart + OUTPUT_SIZE) {
+                        isOutput = true;
+                        if (x === slotMiddle) isOutputCenter = true;
+                    }
+
+                    if (x === 0 && y >= slotStart && y < slotStart + OUTPUT_SIZE) {
+                        isOutput = true;
+                        if (y === slotMiddle) isOutputCenter = true;
+                    }
+                }
+
+                if (isBlocked) {
+                    cell.classList.add('blocked');
+                }
+                if (isOutputCenter) {
+                    cell.classList.add('output-center');
+                } else if (isOutput) {
+                    cell.classList.add('output');
+                }
+
+                grid[y][x] = {
+                    el: cell,
+                    blocked: isBlocked,
+                    output: isOutput,
+                    content: null
+                };
+
+                gridEl.appendChild(cell);
+            }
+        }
+
+        gridEl.addEventListener('mousedown', onGridMouseDown);
+        gridEl.addEventListener('mousemove', onGridMouseMove);
+        gridEl.addEventListener('mouseup', onGridMouseUp);
+        gridEl.addEventListener('mouseleave', onGridMouseUp);
+        gridEl.addEventListener('contextmenu', e => e.preventDefault());
+
+        updateStats();
+    }
+
+    function onGridMouseDown(e) {
+        if (e.target.classList.contains('cell')) {
+            const x = parseInt(e.target.dataset.x);
+            const y = parseInt(e.target.dataset.y);
+
+            if (e.button === 0) {
+                isDragging = true;
+                placeTool(x, y);
+            } else if (e.button === 2) {
+                removeAt(x, y);
+            }
+        }
+    }
+
+    function onGridMouseMove(e) {
+        if (e.target.classList.contains('cell')) {
+            const x = parseInt(e.target.dataset.x);
+            const y = parseInt(e.target.dataset.y);
+
+            updatePreview(x, y);
+
+            const conveyorTypes = ['conveyor-r', 'conveyor-l', 'conveyor-d', 'conveyor-u'];
+            if (isDragging && conveyorTypes.includes(currentTool)) {
+                placeTool(x, y);
+            }
+        }
+    }
+
+    function onGridMouseUp() {
+        isDragging = false;
+    }
+
+    function updatePreview(x, y) {
+        const preview = document.getElementById('preview');
+
+        if (currentTool === 'select' || currentTool.startsWith('conveyor')) {
+            preview.style.display = 'none';
+            return;
+        }
+
+        const facility = FACILITIES[currentTool];
+        if (!facility) {
+            preview.style.display = 'none';
+            return;
+        }
+
+        const gridRect = document.getElementById('grid').getBoundingClientRect();
+        const left = gridRect.left + x * cellSize;
+        const top = gridRect.top + y * cellSize;
+
+        preview.style.display = 'block';
+        preview.style.left = left + 'px';
+        preview.style.top = top + 'px';
+        preview.style.width = (facility.w * cellSize) + 'px';
+        preview.style.height = (facility.h * cellSize) + 'px';
+
+        const canPlace = canPlaceFacility(x, y, facility.w, facility.h);
+        preview.classList.toggle('invalid', !canPlace);
+    }
+
+    function placeTool(x, y) {
+        if (currentTool === 'select') return;
+
+        const conveyorTypes = ['conveyor-r', 'conveyor-l', 'conveyor-d', 'conveyor-u', 'turn-rd', 'turn-ld', 'turn-ru', 'turn-lu', 'bridge'];
+        if (conveyorTypes.includes(currentTool)) {
+            placeConveyor(x, y, currentTool === 'bridge' ? 'bridge' : currentTool.replace('conveyor-', '').replace('turn-', ''));
+        } else {
+            const facility = FACILITIES[currentTool];
+            if (facility && canPlaceFacility(x, y, facility.w, facility.h)) {
+                placeFacility(x, y, currentTool);
+            }
+        }
+    }
+
+    function canPlaceFacility(x, y, w, h) {
+        if (x + w > GRID_SIZE || y + h > GRID_SIZE) return false;
+
+        for (let dy = 0; dy < h; dy++) {
+            for (let dx = 0; dx < w; dx++) {
+                const cell = grid[y + dy][x + dx];
+                if (cell.blocked || cell.content) return false;
+            }
+        }
+        return true;
+    }
+
+    function placeFacility(x, y, type) {
+        const facility = FACILITIES[type];
+        const id = Date.now();
+
+        for (let dy = 0; dy < facility.h; dy++) {
+            for (let dx = 0; dx < facility.w; dx++) {
+                grid[y + dy][x + dx].content = { type, id };
+                grid[y + dy][x + dx].el.classList.add('facility', type);
+            }
+        }
+
+        facilities.push({ id, type, x, y, w: facility.w, h: facility.h });
+        renderFacilityOverlays();
+        updateStats();
+    }
+
+    function placeConveyor(x, y, direction) {
+        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+        const cell = grid[y][x];
+        if (cell.blocked || (cell.content && cell.content.type !== 'conveyor')) return;
+
+        cell.content = { type: 'conveyor', direction };
+        cell.el.className = 'cell conveyor-' + direction;
+        updateStats();
+    }
+
+    function removeAt(x, y) {
+        const cell = grid[y][x];
+        if (!cell.content) return;
+
+        if (cell.content.type === 'conveyor') {
+            cell.content = null;
+            cell.el.className = 'cell';
+            if (cell.blocked) cell.el.classList.add('blocked');
+            if (cell.output) cell.el.classList.add('output');
+        } else {
+            const facilityId = cell.content.id;
+            const facility = facilities.find(f => f.id === facilityId);
+            if (facility) {
+                for (let dy = 0; dy < facility.h; dy++) {
+                    for (let dx = 0; dx < facility.w; dx++) {
+                        const c = grid[facility.y + dy][facility.x + dx];
+                        c.content = null;
+                        c.el.className = 'cell';
+                        if (c.blocked) c.el.classList.add('blocked');
+                        if (c.output) c.el.classList.add('output');
+                    }
+                }
+                facilities = facilities.filter(f => f.id !== facilityId);
+                renderFacilityOverlays();
+            }
+        }
+        updateStats();
+    }
+
+    function renderFacilityOverlays() {
+        document.querySelectorAll('.facility-overlay').forEach(el => el.remove());
+        document.querySelectorAll('.pylon-coverage').forEach(el => el.remove());
+
+        const gridWrapper = document.querySelector('.grid-wrapper');
+
+        for (const f of facilities) {
+            if (f.type === 'pylon') {
+                const coverage = document.createElement('div');
+                coverage.className = 'pylon-coverage';
+                const coverX = Math.max(0, f.x - 5);
+                const coverY = Math.max(0, f.y - 5);
+                const coverW = Math.min(12, GRID_SIZE - coverX);
+                const coverH = Math.min(12, GRID_SIZE - coverY);
+                coverage.style.left = (coverX * cellSize) + 'px';
+                coverage.style.top = (coverY * cellSize) + 'px';
+                coverage.style.width = (coverW * cellSize) + 'px';
+                coverage.style.height = (coverH * cellSize) + 'px';
+                gridWrapper.appendChild(coverage);
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'facility-overlay';
+            overlay.style.left = (f.x * cellSize + 2) + 'px';
+            overlay.style.top = (f.y * cellSize + 2) + 'px';
+            overlay.style.width = (f.w * cellSize - 4) + 'px';
+            overlay.style.height = (f.h * cellSize - 4) + 'px';
+            overlay.style.background = FACILITIES[f.type].color + '88';
+
+            const facilityDef = FACILITIES[f.type];
+            let ioText = '';
+            if (facilityDef.input === 'left') ioText += '←';
+            if (facilityDef.input === 'top') ioText += '↓';
+            if (facilityDef.input === 'top2') ioText += '↓↓';
+            if (facilityDef.input === 'any') ioText += '◎';
+            ioText += facilityDef.name;
+            if (facilityDef.output === 'right') ioText += '→';
+            if (facilityDef.output === 'bottom') ioText += '↓';
+            if (facilityDef.output === 'any') ioText += '◎';
+
+            overlay.textContent = ioText;
+            gridWrapper.appendChild(overlay);
+        }
+    }
+
+    function updateStats() {
+        let usedArea = 0;
+        let conveyorCount = 0;
+        let pylonCount = 0;
+
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                if (grid[y][x].content) {
+                    usedArea++;
+                    if (grid[y][x].content.type === 'conveyor') {
+                        conveyorCount++;
+                    }
+                }
+            }
+        }
+
+        const facilityCount = facilities.filter(f => f.type !== 'pylon').length;
+        pylonCount = facilities.filter(f => f.type === 'pylon').length;
+
+        const totalArea = GRID_SIZE * GRID_SIZE - BLOCKED_SIZE * BLOCKED_SIZE;
+
+        document.getElementById('statArea').textContent = `${usedArea} / ${totalArea}`;
+        document.getElementById('statFacilities').textContent = facilityCount;
+        document.getElementById('statConveyors').textContent = conveyorCount;
+        document.getElementById('statPylons').textContent = pylonCount;
+    }
+
+    function selectTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tool === tool);
+        });
+        document.getElementById('preview').style.display = 'none';
+    }
+
+    function clearAll() {
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                const cell = grid[y][x];
+                cell.content = null;
+                cell.el.className = 'cell';
+                if (cell.blocked) cell.el.classList.add('blocked');
+                if (cell.output) cell.el.classList.add('output');
+            }
+        }
+        facilities = [];
+        renderFacilityOverlays();
+        updateStats();
+    }
+
+    function clearFacilities() {
+        for (const f of [...facilities]) {
+            for (let dy = 0; dy < f.h; dy++) {
+                for (let dx = 0; dx < f.w; dx++) {
+                    const cell = grid[f.y + dy][f.x + dx];
+                    cell.content = null;
+                    cell.el.className = 'cell';
+                    if (cell.blocked) cell.el.classList.add('blocked');
+                    if (cell.output) cell.el.classList.add('output');
+                }
+            }
+        }
+        facilities = [];
+        renderFacilityOverlays();
+        updateStats();
+    }
+
+    function zoomIn() {
+        cellSize = Math.min(20, cellSize + 2);
+        refreshGrid();
+    }
+
+    function zoomOut() {
+        cellSize = Math.max(4, cellSize - 2);
+        refreshGrid();
+    }
+
+    function refreshGrid() {
+        const gridEl = document.getElementById('grid');
+        gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, ${cellSize}px)`;
+
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                grid[y][x].el.style.width = cellSize + 'px';
+                grid[y][x].el.style.height = cellSize + 'px';
+            }
+        }
+        renderFacilityOverlays();
+    }
+
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectTool(btn.dataset.tool));
+    });
+
+    document.getElementById('gridContainer').addEventListener('wheel', e => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            if (e.deltaY < 0) zoomIn();
+            else zoomOut();
+        }
+    });
+
+    function loadCitromExample() {
+        clearAll();
+        loadBuckCapsuleExample();
+    }
+
+    function loadBuckCapsuleExample() {
+        for (let i = 1; i <= 8; i++) placeConveyor(1, i, 'd');
+        placeConveyor(1, 9, 'rd');
+        for (let i = 2; i <= 4; i++) placeConveyor(i, 9, 'r');
+
+        placeConveyor(5, 9, 'ru');
+        for (let i = 8; i >= 5; i--) placeConveyor(5, i, 'u');
+        placeConveyor(5, 4, 'ru');
+        placeConveyor(6, 4, 'r');
+        placeFacility(7, 3, 'grinder');
+        placeConveyor(10, 4, 'r');
+        placeConveyor(11, 4, 'd');
+
+        for (let i = 5; i <= 9; i++) placeConveyor(11, i, 'd');
+        placeConveyor(11, 10, 'ld');
+        for (let i = 10; i >= 7; i--) placeConveyor(i, 10, 'l');
+
+        placeFacility(4, 11, 'filling');
+        placeConveyor(7, 15, 'd');
+        placeConveyor(7, 16, 'd');
+        placeFacility(6, 17, 'storage');
+
+        placeConveyor(5, 10, 'rd');
+        for (let i = 11; i <= 14; i++) placeConveyor(5, i, 'd');
+        placeConveyor(5, 15, 'ld');
+        placeConveyor(4, 15, 'lu');
+
+        placeFacility(13, 1, 'furnace');
+        placeFacility(16, 1, 'furnace');
+        placeFacility(19, 1, 'furnace');
+        placeFacility(22, 1, 'furnace');
+        placeFacility(25, 1, 'furnace');
+        placeFacility(28, 1, 'furnace');
+        placeFacility(31, 1, 'furnace');
+
+        placeConveyor(12, 2, 'r');
+        for (let i = 16; i <= 33; i += 3) {
+            placeConveyor(i, 2, 'r');
+        }
+
+        placeConveyor(34, 2, 'rd');
+        for (let i = 3; i <= 9; i++) placeConveyor(34, i, 'd');
+        placeConveyor(34, 10, 'ld');
+        for (let i = 33; i >= 12; i--) placeConveyor(i, 10, 'l');
+
+        placeFacility(2, 2, 'pylon');
+        placeFacility(8, 8, 'pylon');
+        placeFacility(20, 5, 'pylon');
+    }
+
+    // === ЭКСПОРТ/ИМПОРТ СХЕМ ===
+
+    function getConveyorData() {
+        const conveyors = [];
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                const cell = grid[y][x];
+                if (cell.content && cell.content.type === 'conveyor') {
+                    conveyors.push({ x, y, dir: cell.content.direction });
+                }
+            }
+        }
+        return conveyors;
+    }
+
+    function exportLayout() {
+        const layoutName = prompt('Название схемы:', 'Моя схема');
+        if (!layoutName) return;
+
+        const data = {
+            name: layoutName,
+            author: 'User',
+            date: new Date().toISOString().split('T')[0],
+            facilities: facilities.map(f => ({ type: f.type, x: f.x, y: f.y })),
+            conveyors: getConveyorData()
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = layoutName.replace(/\s+/g, '_').toLowerCase() + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importLayout() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    loadLayoutData(data);
+                    alert('Схема "' + data.name + '" загружена!');
+                } catch (err) {
+                    alert('Ошибка чтения файла: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    function loadLayoutData(data) {
+        clearAll();
+        for (const f of data.facilities) {
+            placeFacility(f.x, f.y, f.type);
+        }
+        for (const c of data.conveyors) {
+            placeConveyor(c.x, c.y, c.dir);
+        }
+        updateStats();
+    }
+
+    function loadSavedLayout(filename) {
+        if (!filename) return;
+        fetch('data/layouts/' + filename)
+            .then(r => r.json())
+            .then(data => {
+                loadLayoutData(data);
+                document.getElementById('savedLayouts').value = '';
+            })
+            .catch(err => alert('Ошибка загрузки: ' + err.message));
+    }
+
+    function loadLayoutsList() {
+        fetch('data/layouts/index.json')
+            .then(r => r.json())
+            .then(list => {
+                const select = document.getElementById('savedLayouts');
+                for (const item of list) {
+                    const opt = document.createElement('option');
+                    opt.value = item.file;
+                    opt.textContent = item.name;
+                    select.appendChild(opt);
+                }
+            })
+            .catch(() => {});
+    }
+
+    // === ПРИМЕРЫ ===
+
+    function loadBottlesExample() {
+        clearAll();
+
+        // Простой пример: 4 очистки → 2 формовки = бутылки
+        // ВАЖНО: Вся грань станка = входы/выходы (3x3 = 3 входа, 3 выхода)
+        // НЕ сливаем ленты - каждая лента в свой вход
+
+        // 4 очистки в вертикальном ряду, с промежутком для конвейеров
+        // F1 и F2 → формовка S1 (2 выхода в 2 входа)
+        // F3 и F4 → формовка S2 (2 выхода в 2 входа)
+
+        // Позиции очисток (3x3 каждая):
+        placeFacility(4, 1, 'furnace');   // F1: x=4-6, y=1-3, выходы x=7, y=1,2,3
+        placeFacility(4, 5, 'furnace');   // F2: x=4-6, y=5-7, выходы x=7, y=5,6,7
+
+        placeFacility(4, 11, 'furnace');  // F3: x=4-6, y=11-13, выходы x=7, y=11,12,13
+        placeFacility(4, 15, 'furnace');  // F4: x=4-6, y=15-17, выходы x=7, y=15,16,17
+
+        // Входные конвейеры к очисткам (из складских выходов слева)
+        for (let x = 1; x <= 3; x++) placeConveyor(x, 2, 'r');   // → F1 средний вход
+        for (let x = 1; x <= 3; x++) placeConveyor(x, 6, 'r');   // → F2 средний вход
+        for (let x = 1; x <= 3; x++) placeConveyor(x, 12, 'r');  // → F3 средний вход
+        for (let x = 1; x <= 3; x++) placeConveyor(x, 16, 'r');  // → F4 средний вход
+
+        // Формовка S1 между F1 и F2
+        // F1 выход (y=3, нижний) поворачивает вниз, потом вправо в верхний вход S1
+        // F2 выход (y=5, верхний) поворачивает вверх, потом вправо в нижний вход S1
+        placeFacility(10, 3, 'shaping');  // S1: x=10-12, y=3-5, входы x=10, y=3,4,5
+
+        // F1 (выход y=3) → прямо вправо в S1 верхний вход
+        for (let x = 7; x <= 9; x++) placeConveyor(x, 3, 'r');
+
+        // F2 (выход y=5) → прямо вправо в S1 нижний вход
+        for (let x = 7; x <= 9; x++) placeConveyor(x, 5, 'r');
+
+        // S1 выход → хранилище
+        for (let x = 13; x <= 15; x++) placeConveyor(x, 4, 'r');
+        placeFacility(16, 3, 'storage');
+
+        // Формовка S2 между F3 и F4
+        placeFacility(10, 13, 'shaping'); // S2: x=10-12, y=13-15, входы x=10, y=13,14,15
+
+        // F3 (выход y=13) → прямо вправо в S2 верхний вход
+        for (let x = 7; x <= 9; x++) placeConveyor(x, 13, 'r');
+
+        // F4 (выход y=15) → прямо вправо в S2 нижний вход
+        for (let x = 7; x <= 9; x++) placeConveyor(x, 15, 'r');
+
+        // S2 выход → хранилище
+        for (let x = 13; x <= 15; x++) placeConveyor(x, 14, 'r');
+        placeFacility(16, 13, 'storage');
+
+        // Пилоны (не на конвейерах!)
+        placeFacility(8, 8, 'pylon');  // между группами
+
+        updateStats();
+    }
+
+    initGrid();
+    loadLayoutsList();
+    </script>
+</body>
+</html>

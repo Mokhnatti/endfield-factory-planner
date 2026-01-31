@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endfield Factory Editor v2</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            color: #4fc3f7;
+            font-size: 12px;
+            margin: 8px 0 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #333;
+        }
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid #444;
+            background: rgba(255,255,255,0.05);
+            color: #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+        .tool-btn:hover { background: rgba(255,255,255,0.1); }
+        .tool-btn.active { background: rgba(79,195,247,0.2); border-color: #4fc3f7; color: #4fc3f7; }
+        .tool-btn .icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .tool-btn .info { margin-left: auto; color: #666; font-size: 10px; }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .toolbar {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+        }
+        .toolbar button {
+            padding: 6px 12px;
+            border: 1px solid #444;
+            background: rgba(255,255,255,0.08);
+            color: #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .toolbar button:hover { background: rgba(255,255,255,0.15); }
+        .toolbar button.primary { background: #2d5a5a; border-color: #4a8a8a; }
+        .toolbar .spacer { flex: 1; }
+        .toolbar .status { color: #888; font-size: 11px; }
+
+        /* Canvas container */
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            background: #16213e;
+            position: relative;
+        }
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        /* Stats bar */
+        .stats {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            border-top: 1px solid #333;
+        }
+        .stats span { color: #888; }
+        .stats b { color: #ffd700; }
+
+        /* Colors for facilities */
+        .icon.furnace { background: #5a2d2d; }
+        .icon.grinder { background: #5a5a2d; }
+        .icon.shaping { background: #5a3d2d; }
+        .icon.filling { background: #3d2d5a; }
+        .icon.thickener { background: #2d5a5a; }
+        .icon.planter { background: #2d5a2d; }
+        .icon.seed_collector { background: #4a7a2d; }
+        .icon.pylon { background: #7a2d7a; }
+        .icon.storage { background: #5a5a3d; }
+        .icon.drill { background: #5a4a2d; }
+        .icon.pump { background: #2d4a5a; }
+        .icon.conveyor { background: #666; }
+        .icon.select { background: #444; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <h3>Инструменты</h3>
+            <button class="tool-btn active" data-tool="select">
+                <div class="icon select">✋</div>
+                <span>Выбор / Удаление</span>
+            </button>
+            <button class="tool-btn" data-tool="conveyor">
+                <div class="icon conveyor">→</div>
+                <span>Конвейер</span>
+                <span class="info">ЛКМ рисует</span>
+            </button>
+
+            <h3>Обработка (3×3)</h3>
+            <button class="tool-btn" data-tool="furnace">
+                <div class="icon furnace">◼</div>
+                <span>Очистка</span>
+                <span class="info">← →</span>
+            </button>
+            <button class="tool-btn" data-tool="grinder">
+                <div class="icon grinder">◼</div>
+                <span>Перемалывание</span>
+                <span class="info">← →</span>
+            </button>
+            <button class="tool-btn" data-tool="shaping">
+                <div class="icon shaping">◼</div>
+                <span>Формовка</span>
+                <span class="info">← →</span>
+            </button>
+
+            <h3>Большие станки</h3>
+            <button class="tool-btn" data-tool="filling">
+                <div class="icon filling">◼</div>
+                <span>Наполнение</span>
+                <span class="info">6×4 ↓↓</span>
+            </button>
+            <button class="tool-btn" data-tool="thickener">
+                <div class="icon thickener">◼</div>
+                <span>Измельчение</span>
+                <span class="info">6×4 ↓↓</span>
+            </button>
+
+            <h3>Фермерство (5×5)</h3>
+            <button class="tool-btn" data-tool="planter">
+                <div class="icon planter">◼</div>
+                <span>Посадка</span>
+                <span class="info">↑ ↓</span>
+            </button>
+            <button class="tool-btn" data-tool="seed_collector">
+                <div class="icon seed_collector">◼</div>
+                <span>Сбор семян</span>
+                <span class="info">↑ ↓</span>
+            </button>
+
+            <h3>Инфраструктура</h3>
+            <button class="tool-btn" data-tool="pylon">
+                <div class="icon pylon">⚡</div>
+                <span>Пилон</span>
+                <span class="info">2×2</span>
+            </button>
+            <button class="tool-btn" data-tool="storage">
+                <div class="icon storage">◼</div>
+                <span>Хранилище</span>
+                <span class="info">3×3</span>
+            </button>
+            <button class="tool-btn" data-tool="drill">
+                <div class="icon drill">◼</div>
+                <span>Бур</span>
+                <span class="info">2×2</span>
+            </button>
+            <button class="tool-btn" data-tool="pump">
+                <div class="icon pump">◼</div>
+                <span>Насос</span>
+                <span class="info">2×2</span>
+            </button>
+        </div>
+
+        <div class="main">
+            <div class="toolbar">
+                <button onclick="undo()">↩ Отмена</button>
+                <button onclick="redo()">↪ Повтор</button>
+                <button onclick="clearAll()">🗑 Очистить</button>
+                <span style="color:#555">|</span>
+                <button onclick="zoomIn()">🔍+</button>
+                <button onclick="zoomOut()">🔍-</button>
+                <span id="zoomLabel" class="status">100%</span>
+                <span class="spacer"></span>
+                <button class="primary" onclick="exportJSON()">📤 Экспорт</button>
+                <button onclick="importJSON()">📥 Импорт</button>
+                <span class="status">ЛКМ - ставить | ПКМ - удалять | Колёсико - масштаб</span>
+            </div>
+
+            <div class="canvas-container" id="container">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <div class="stats">
+                <div><span>Станков:</span> <b id="statFacilities">0</b></div>
+                <div><span>Конвейеров:</span> <b id="statConveyors">0</b></div>
+                <div><span>Пилонов:</span> <b id="statPylons">0</b></div>
+                <div><span>Площадь:</span> <b id="statArea">0</b> / 3519</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // === CONSTANTS ===
+    const GRID_SIZE = 60;
+    const BLOCKED_CENTER = 9;
+    const BASE_CELL_SIZE = 12;
+
+    const FACILITIES = {
+        furnace:        { w: 3, h: 3, name: 'Очистка',      color: '#5a2d2d', inputSide: 'left', outputSide: 'right' },
+        grinder:        { w: 3, h: 3, name: 'Перемалывание', color: '#5a5a2d', inputSide: 'left', outputSide: 'right' },
+        shaping:        { w: 3, h: 3, name: 'Формовка',      color: '#5a3d2d', inputSide: 'left', outputSide: 'right' },
+        filling:        { w: 6, h: 4, name: 'Наполнение',    color: '#3d2d5a', inputSide: 'top',  outputSide: 'bottom' },
+        thickener:      { w: 6, h: 4, name: 'Измельчение',   color: '#2d5a5a', inputSide: 'top',  outputSide: 'bottom' },
+        planter:        { w: 5, h: 5, name: 'Посадка',       color: '#2d5a2d', inputSide: 'top',  outputSide: 'bottom' },
+        seed_collector: { w: 5, h: 5, name: 'Семена',        color: '#4a7a2d', inputSide: 'top',  outputSide: 'bottom' },
+        pylon:          { w: 2, h: 2, name: 'Пилон',         color: '#7a2d7a', coverage: 12 },
+        storage:        { w: 3, h: 3, name: 'Хранилище',     color: '#5a5a3d', inputSide: 'any' },
+        drill:          { w: 2, h: 2, name: 'Бур',           color: '#5a4a2d', outputSide: 'any' },
+        pump:           { w: 2, h: 2, name: 'Насос',         color: '#2d4a5a', outputSide: 'any' }
+    };
+
+    // === STATE ===
+    let zoom = 1;
+    let cellSize = BASE_CELL_SIZE;
+    let currentTool = 'select';
+    let facilities = [];
+    let conveyors = []; // [{x, y, dir}]
+    let undoStack = [];
+    let redoStack = [];
+    let isDrawing = false;
+    let lastDrawPos = null;
+
+    // === CANVAS SETUP ===
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('container');
+
+    function resizeCanvas() {
+        const size = GRID_SIZE * cellSize;
+        canvas.width = size;
+        canvas.height = size;
+        render();
+    }
+
+    // === RENDERING ===
+    function render() {
+        const size = GRID_SIZE * cellSize;
+        ctx.clearRect(0, 0, size, size);
+
+        // Background
+        ctx.fillStyle = '#1e2a4a';
+        ctx.fillRect(0, 0, size, size);
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= GRID_SIZE; i++) {
+            ctx.beginPath();
+            ctx.moveTo(i * cellSize, 0);
+            ctx.lineTo(i * cellSize, size);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, i * cellSize);
+            ctx.lineTo(size, i * cellSize);
+            ctx.stroke();
+        }
+
+        // Blocked center (9x9)
+        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
+        ctx.fillStyle = 'rgba(100, 30, 30, 0.5)';
+        ctx.fillRect(blockStart * cellSize, blockStart * cellSize,
+                     BLOCKED_CENTER * cellSize, BLOCKED_CENTER * cellSize);
+        ctx.strokeStyle = '#a44';
+        ctx.strokeRect(blockStart * cellSize, blockStart * cellSize,
+                       BLOCKED_CENTER * cellSize, BLOCKED_CENTER * cellSize);
+
+        // Output zones (green areas on edges) with center dots
+        for (let i = 0; i < GRID_SIZE; i += 3) {
+            const centerOffset = 1; // центр из 3 тайлов (0, 1, 2)
+
+            // Top edge - 3 тайла шириной, выход по центру
+            ctx.fillStyle = 'rgba(30, 100, 30, 0.2)';
+            ctx.fillRect(i * cellSize, 0, 3 * cellSize, cellSize);
+            // Центральная точка выхода (сверху)
+            ctx.fillStyle = '#4f4';
+            ctx.beginPath();
+            ctx.arc((i + centerOffset) * cellSize + cellSize/2, cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Left edge - 3 тайла высотой, выход по центру
+            ctx.fillStyle = 'rgba(30, 100, 30, 0.2)';
+            ctx.fillRect(0, i * cellSize, cellSize, 3 * cellSize);
+            // Центральная точка выхода (слева)
+            ctx.fillStyle = '#4f4';
+            ctx.beginPath();
+            ctx.arc(cellSize/2, (i + centerOffset) * cellSize + cellSize/2, cellSize * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Conveyors
+        for (const c of conveyors) {
+            drawConveyor(c.x, c.y, c.dir);
+        }
+
+        // Facilities
+        for (const f of facilities) {
+            drawFacility(f);
+        }
+
+        // Preview (current tool)
+        if (currentTool !== 'select' && currentTool !== 'conveyor' && hoverPos) {
+            drawPreview(hoverPos.x, hoverPos.y);
+        }
+
+        updateStats();
+    }
+
+    function drawConveyor(x, y, dir) {
+        const cx = x * cellSize + cellSize / 2;
+        const cy = y * cellSize + cellSize / 2;
+        const s = cellSize * 0.3;
+
+        ctx.fillStyle = '#666';
+        ctx.fillRect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2);
+
+        // Arrow
+        ctx.fillStyle = '#ffa';
+        ctx.beginPath();
+        switch(dir) {
+            case 'r': ctx.moveTo(cx-s, cy-s); ctx.lineTo(cx+s, cy); ctx.lineTo(cx-s, cy+s); break;
+            case 'l': ctx.moveTo(cx+s, cy-s); ctx.lineTo(cx-s, cy); ctx.lineTo(cx+s, cy+s); break;
+            case 'd': ctx.moveTo(cx-s, cy-s); ctx.lineTo(cx, cy+s); ctx.lineTo(cx+s, cy-s); break;
+            case 'u': ctx.moveTo(cx-s, cy+s); ctx.lineTo(cx, cy-s); ctx.lineTo(cx+s, cy+s); break;
+        }
+        ctx.fill();
+    }
+
+    function drawFacility(f) {
+        const def = FACILITIES[f.type];
+        const x = f.x * cellSize;
+        const y = f.y * cellSize;
+        const w = def.w * cellSize;
+        const h = def.h * cellSize;
+
+        // Body
+        ctx.fillStyle = def.color;
+        ctx.fillRect(x, y, w, h);
+
+        // Border
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, w, h);
+
+        // Name
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = `${Math.max(8, cellSize * 0.8)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(def.name, x + w/2, y + h/2);
+
+        // Input/Output indicators
+        ctx.font = `${Math.max(6, cellSize * 0.6)}px sans-serif`;
+        if (def.inputSide === 'left') {
+            ctx.fillText('←', x + cellSize/2, y + h/2);
+        } else if (def.inputSide === 'top') {
+            ctx.fillText('↓', x + w/2, y + cellSize/2);
+        }
+        if (def.outputSide === 'right') {
+            ctx.fillText('→', x + w - cellSize/2, y + h/2);
+        } else if (def.outputSide === 'bottom') {
+            ctx.fillText('↓', x + w/2, y + h - cellSize/2);
+        }
+
+        // Pylon coverage
+        if (f.type === 'pylon' && def.coverage) {
+            const coverage = def.coverage;
+            const covX = Math.max(0, f.x - coverage/2 + 1) * cellSize;
+            const covY = Math.max(0, f.y - coverage/2 + 1) * cellSize;
+            const covW = Math.min(coverage, GRID_SIZE - f.x + coverage/2 - 1) * cellSize;
+            const covH = Math.min(coverage, GRID_SIZE - f.y + coverage/2 - 1) * cellSize;
+            ctx.strokeStyle = 'rgba(122, 45, 122, 0.4)';
+            ctx.setLineDash([4, 4]);
+            ctx.strokeRect(covX, covY, covW, covH);
+            ctx.setLineDash([]);
+        }
+    }
+
+    let hoverPos = null;
+    function drawPreview(x, y) {
+        const def = FACILITIES[currentTool];
+        if (!def) return;
+
+        const canPlace = canPlaceFacility(x, y, def.w, def.h);
+        ctx.fillStyle = canPlace ? 'rgba(79, 195, 247, 0.3)' : 'rgba(244, 67, 54, 0.3)';
+        ctx.fillRect(x * cellSize, y * cellSize, def.w * cellSize, def.h * cellSize);
+        ctx.strokeStyle = canPlace ? '#4fc3f7' : '#f44336';
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(x * cellSize, y * cellSize, def.w * cellSize, def.h * cellSize);
+        ctx.setLineDash([]);
+    }
+
+    // === PLACEMENT LOGIC ===
+    function canPlaceFacility(x, y, w, h) {
+        if (x < 0 || y < 0 || x + w > GRID_SIZE || y + h > GRID_SIZE) return false;
+
+        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
+        const blockEnd = blockStart + BLOCKED_CENTER;
+
+        for (let dy = 0; dy < h; dy++) {
+            for (let dx = 0; dx < w; dx++) {
+                const cx = x + dx;
+                const cy = y + dy;
+
+                // Check blocked center
+                if (cx >= blockStart && cx < blockEnd && cy >= blockStart && cy < blockEnd) {
+                    return false;
+                }
+
+                // Check existing facilities
+                for (const f of facilities) {
+                    const fd = FACILITIES[f.type];
+                    if (cx >= f.x && cx < f.x + fd.w && cy >= f.y && cy < f.y + fd.h) {
+                        return false;
+                    }
+                }
+
+                // Check conveyors
+                if (conveyors.some(c => c.x === cx && c.y === cy)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function canPlaceConveyor(x, y) {
+        if (x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE) return false;
+
+        const blockStart = (GRID_SIZE - BLOCKED_CENTER) / 2;
+        const blockEnd = blockStart + BLOCKED_CENTER;
+        if (x >= blockStart && x < blockEnd && y >= blockStart && y < blockEnd) return false;
+
+        // Check facilities
+        for (const f of facilities) {
+            const fd = FACILITIES[f.type];
+            if (x >= f.x && x < f.x + fd.w && y >= f.y && y < f.y + fd.h) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function placeFacility(x, y, type) {
+        const def = FACILITIES[type];
+        if (!canPlaceFacility(x, y, def.w, def.h)) return false;
+
+        saveState();
+        facilities.push({ type, x, y, id: Date.now() });
+        render();
+        return true;
+    }
+
+    function placeConveyor(x, y, dir) {
+        if (!canPlaceConveyor(x, y)) return false;
+
+        // Remove existing conveyor at position
+        conveyors = conveyors.filter(c => !(c.x === x && c.y === y));
+        conveyors.push({ x, y, dir });
+        render();
+        return true;
+    }
+
+    function removeAt(x, y) {
+        saveState();
+
+        // Remove conveyor
+        const convIdx = conveyors.findIndex(c => c.x === x && c.y === y);
+        if (convIdx >= 0) {
+            conveyors.splice(convIdx, 1);
+            render();
+            return;
+        }
+
+        // Remove facility
+        for (let i = facilities.length - 1; i >= 0; i--) {
+            const f = facilities[i];
+            const fd = FACILITIES[f.type];
+            if (x >= f.x && x < f.x + fd.w && y >= f.y && y < f.y + fd.h) {
+                facilities.splice(i, 1);
+                render();
+                return;
+            }
+        }
+    }
+
+    // === UNDO/REDO ===
+    function saveState() {
+        undoStack.push(JSON.stringify({ facilities, conveyors }));
+        if (undoStack.length > 50) undoStack.shift();
+        redoStack = [];
+    }
+
+    function undo() {
+        if (undoStack.length === 0) return;
+        redoStack.push(JSON.stringify({ facilities, conveyors }));
+        const state = JSON.parse(undoStack.pop());
+        facilities = state.facilities;
+        conveyors = state.conveyors;
+        render();
+    }
+
+    function redo() {
+        if (redoStack.length === 0) return;
+        undoStack.push(JSON.stringify({ facilities, conveyors }));
+        const state = JSON.parse(redoStack.pop());
+        facilities = state.facilities;
+        conveyors = state.conveyors;
+        render();
+    }
+
+    // === ZOOM ===
+    function zoomIn() {
+        zoom = Math.min(3, zoom + 0.25);
+        cellSize = BASE_CELL_SIZE * zoom;
+        document.getElementById('zoomLabel').textContent = Math.round(zoom * 100) + '%';
+        resizeCanvas();
+    }
+
+    function zoomOut() {
+        zoom = Math.max(0.5, zoom - 0.25);
+        cellSize = BASE_CELL_SIZE * zoom;
+        document.getElementById('zoomLabel').textContent = Math.round(zoom * 100) + '%';
+        resizeCanvas();
+    }
+
+    // === CLEAR ===
+    function clearAll() {
+        if (!confirm('Очистить всё?')) return;
+        saveState();
+        facilities = [];
+        conveyors = [];
+        render();
+    }
+
+    // === EXPORT/IMPORT ===
+    function exportJSON() {
+        const name = prompt('Название схемы:', 'Моя фабрика');
+        if (!name) return;
+
+        const data = {
+            name,
+            author: 'User',
+            date: new Date().toISOString().split('T')[0],
+            facilities: facilities.map(f => ({ type: f.type, x: f.x, y: f.y })),
+            conveyors
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const filename = name.replace(/\s+/g, '_').toLowerCase() + '.json';
+
+        // Скачать файл
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        // Копировать в буфер
+        navigator.clipboard.writeText(json).then(() => {
+            alert(`Схема "${name}" сохранена!\n\nФайл: ${filename}\nJSON также скопирован в буфер обмена.\n\nОтправь файл Рамилю для коллекции схем!`);
+        }).catch(() => {
+            alert(`Схема "${name}" сохранена!\n\nФайл: ${filename}\n\nОтправь файл Рамилю для коллекции схем!`);
+        });
+    }
+
+    function importJSON() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    saveState();
+                    facilities = data.facilities.map(f => ({ ...f, id: Date.now() + Math.random() }));
+                    conveyors = data.conveyors || [];
+                    render();
+                    alert('Загружено: ' + data.name);
+                } catch (err) {
+                    alert('Ошибка: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    // === STATS ===
+    function updateStats() {
+        const pylons = facilities.filter(f => f.type === 'pylon').length;
+        const facs = facilities.filter(f => f.type !== 'pylon').length;
+
+        let area = conveyors.length;
+        for (const f of facilities) {
+            const def = FACILITIES[f.type];
+            area += def.w * def.h;
+        }
+
+        document.getElementById('statFacilities').textContent = facs;
+        document.getElementById('statConveyors').textContent = conveyors.length;
+        document.getElementById('statPylons').textContent = pylons;
+        document.getElementById('statArea').textContent = area;
+    }
+
+    // === EVENT HANDLERS ===
+    function getGridPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left) / cellSize);
+        const y = Math.floor((e.clientY - rect.top) / cellSize);
+        return { x, y };
+    }
+
+    canvas.addEventListener('mousemove', e => {
+        hoverPos = getGridPos(e);
+
+        if (isDrawing && currentTool === 'conveyor') {
+            const pos = hoverPos;
+            if (!lastDrawPos || pos.x !== lastDrawPos.x || pos.y !== lastDrawPos.y) {
+                // Determine direction based on movement
+                let dir = 'r';
+                if (lastDrawPos) {
+                    if (pos.x > lastDrawPos.x) dir = 'r';
+                    else if (pos.x < lastDrawPos.x) dir = 'l';
+                    else if (pos.y > lastDrawPos.y) dir = 'd';
+                    else if (pos.y < lastDrawPos.y) dir = 'u';
+                }
+                placeConveyor(pos.x, pos.y, dir);
+                lastDrawPos = pos;
+            }
+        }
+
+        render();
+    });
+
+    canvas.addEventListener('mousedown', e => {
+        const pos = getGridPos(e);
+
+        if (e.button === 0) { // Left click
+            if (currentTool === 'select') {
+                // Select mode - удаление по ЛКМ
+                removeAt(pos.x, pos.y);
+            } else if (currentTool === 'conveyor') {
+                saveState();
+                isDrawing = true;
+                lastDrawPos = pos;
+                placeConveyor(pos.x, pos.y, 'r');
+            } else {
+                placeFacility(pos.x, pos.y, currentTool);
+            }
+        } else if (e.button === 2) { // Right click
+            removeAt(pos.x, pos.y);
+        }
+    });
+
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+        lastDrawPos = null;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        isDrawing = false;
+        lastDrawPos = null;
+        hoverPos = null;
+        render();
+    });
+
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+    canvas.addEventListener('wheel', e => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            if (e.deltaY < 0) zoomIn();
+            else zoomOut();
+        }
+    });
+
+    // Tool selection
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTool = btn.dataset.tool;
+        });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
+        if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+        if (e.key === 'Escape') {
+            document.querySelector('[data-tool="select"]').click();
+        }
+    });
+
+    // Init
+    resizeCanvas();
+    </script>
+</body>
+</html>

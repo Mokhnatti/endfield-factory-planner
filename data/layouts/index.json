@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Бутылки (user)",
+    "file": "bottles_user.json",
+    "author": "User",
+    "description": "4 очистки → 2 формовки, правый верхний угол"
+  },
+  {
+    "name": "Бутылки (Claude)",
+    "file": "bottles_claude.json",
+    "author": "Claude",
+    "description": "4 очистки → 2 формовки, левый край у склада"
+  },
+  {
+    "name": "Бутылки (пример)",
+    "file": "bottles_simple.json",
+    "author": "Claude",
+    "description": "Простой пример: 4 очистки → 2 формовки = бутылки"
+  }
+]
