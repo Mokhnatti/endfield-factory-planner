@@ -226,7 +226,8 @@
                 <span class="spacer"></span>
                 <button class="primary" onclick="exportJSON()">📤 Экспорт</button>
                 <button onclick="importJSON()">📥 Импорт</button>
-                <span class="status">ЛКМ - ставить | ПКМ - удалять | Колёсико - масштаб</span>
+                <span id="rotationLabel" class="status" style="color:#ffd700">R: 0°</span>
+                <span class="status">ЛКМ - ставить | ПКМ - удалять | R - поворот</span>
             </div>
 
             <div class="canvas-container" id="container">
@@ -266,12 +267,30 @@
     let zoom = 1;
     let cellSize = BASE_CELL_SIZE;
     let currentTool = 'select';
+    let currentRotation = 0; // 0, 1, 2, 3 = 0°, 90°, 180°, 270°
     let facilities = [];
     let conveyors = []; // [{x, y, dir}]
     let undoStack = [];
     let redoStack = [];
     let isDrawing = false;
     let lastDrawPos = null;
+
+    // Rotate a side by rotation steps (clockwise)
+    function rotateSide(side, rotation) {
+        if (!side || side === 'any') return side;
+        const sides = ['top', 'right', 'bottom', 'left'];
+        const idx = sides.indexOf(side);
+        if (idx === -1) return side;
+        return sides[(idx + rotation) % 4];
+    }
+
+    // Get effective input/output sides for a facility considering rotation
+    function getEffectiveSides(def, rotation = 0) {
+        return {
+            inputSide: rotateSide(def.inputSide, rotation),
+            outputSide: rotateSide(def.outputSide, rotation)
+        };
+    }
 
     // === CANVAS SETUP ===
     const canvas = document.getElementById('canvas');
@@ -372,6 +391,8 @@
 
     function drawFacility(f) {
         const def = FACILITIES[f.type];
+        const rotation = f.rotation || 0;
+        const { inputSide, outputSide } = getEffectiveSides(def, rotation);
         const x = f.x * cellSize;
         const y = f.y * cellSize;
         const w = def.w * cellSize;
@@ -385,7 +406,7 @@
         const dotRadius = cellSize * 0.25;
 
         // Input side (yellow/orange)
-        if (def.inputSide === 'left') {
+        if (inputSide === 'left') {
             for (let i = 0; i < def.h; i++) {
                 ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
                 ctx.fillRect(x, y + i * cellSize, cellSize, cellSize);
@@ -394,7 +415,7 @@
                 ctx.arc(x + cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-        } else if (def.inputSide === 'top') {
+        } else if (inputSide === 'top') {
             for (let i = 0; i < def.w; i++) {
                 ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
                 ctx.fillRect(x + i * cellSize, y, cellSize, cellSize);
@@ -403,7 +424,25 @@
                 ctx.arc(x + i * cellSize + cellSize/2, y + cellSize/2, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-        } else if (def.inputSide === 'any') {
+        } else if (inputSide === 'right') {
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
+                ctx.fillRect(x + w - cellSize, y + i * cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#fa0';
+                ctx.beginPath();
+                ctx.arc(x + w - cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (inputSide === 'bottom') {
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillStyle = 'rgba(255, 180, 0, 0.4)';
+                ctx.fillRect(x + i * cellSize, y + h - cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#fa0';
+                ctx.beginPath();
+                ctx.arc(x + i * cellSize + cellSize/2, y + h - cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (inputSide === 'any') {
             // Storage - все стороны вход (жёлтые точки по периметру)
             ctx.fillStyle = '#fa0';
             for (let i = 0; i < def.w; i++) {
@@ -417,7 +456,7 @@
         }
 
         // Output side (green)
-        if (def.outputSide === 'right') {
+        if (outputSide === 'right') {
             for (let i = 0; i < def.h; i++) {
                 ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
                 ctx.fillRect(x + w - cellSize, y + i * cellSize, cellSize, cellSize);
@@ -426,7 +465,7 @@
                 ctx.arc(x + w - cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-        } else if (def.outputSide === 'bottom') {
+        } else if (outputSide === 'bottom') {
             for (let i = 0; i < def.w; i++) {
                 ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
                 ctx.fillRect(x + i * cellSize, y + h - cellSize, cellSize, cellSize);
@@ -435,7 +474,25 @@
                 ctx.arc(x + i * cellSize + cellSize/2, y + h - cellSize/2, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
             }
-        } else if (def.outputSide === 'any') {
+        } else if (outputSide === 'left') {
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
+                ctx.fillRect(x, y + i * cellSize, cellSize, cellSize);
+                ctx.fillStyle = '#0c0';
+                ctx.beginPath();
+                ctx.arc(x + cellSize/2, y + i * cellSize + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (outputSide === 'top') {
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillStyle = 'rgba(0, 200, 0, 0.4)';
+                ctx.fillRect(x + i * cellSize, y, cellSize, cellSize);
+                ctx.fillStyle = '#0c0';
+                ctx.beginPath();
+                ctx.arc(x + i * cellSize + cellSize/2, y + cellSize/2, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else if (outputSide === 'any') {
             // Drill/Pump - все стороны выход (зелёные точки по периметру)
             ctx.fillStyle = '#0c0';
             for (let i = 0; i < def.w; i++) {
@@ -480,12 +537,35 @@
         if (!def) return;
 
         const canPlace = canPlaceFacility(x, y, def.w, def.h);
+        const px = x * cellSize;
+        const py = y * cellSize;
+        const pw = def.w * cellSize;
+        const ph = def.h * cellSize;
+
         ctx.fillStyle = canPlace ? 'rgba(79, 195, 247, 0.3)' : 'rgba(244, 67, 54, 0.3)';
-        ctx.fillRect(x * cellSize, y * cellSize, def.w * cellSize, def.h * cellSize);
+        ctx.fillRect(px, py, pw, ph);
         ctx.strokeStyle = canPlace ? '#4fc3f7' : '#f44336';
         ctx.setLineDash([4, 4]);
-        ctx.strokeRect(x * cellSize, y * cellSize, def.w * cellSize, def.h * cellSize);
+        ctx.strokeRect(px, py, pw, ph);
         ctx.setLineDash([]);
+
+        // Show rotated I/O in preview
+        const { inputSide, outputSide } = getEffectiveSides(def, currentRotation);
+        const dotRadius = cellSize * 0.2;
+
+        // Input indicator (yellow)
+        ctx.fillStyle = 'rgba(255, 180, 0, 0.8)';
+        if (inputSide === 'left') ctx.fillRect(px, py, cellSize * 0.3, ph);
+        else if (inputSide === 'right') ctx.fillRect(px + pw - cellSize * 0.3, py, cellSize * 0.3, ph);
+        else if (inputSide === 'top') ctx.fillRect(px, py, pw, cellSize * 0.3);
+        else if (inputSide === 'bottom') ctx.fillRect(px, py + ph - cellSize * 0.3, pw, cellSize * 0.3);
+
+        // Output indicator (green)
+        ctx.fillStyle = 'rgba(0, 200, 0, 0.8)';
+        if (outputSide === 'left') ctx.fillRect(px, py, cellSize * 0.3, ph);
+        else if (outputSide === 'right') ctx.fillRect(px + pw - cellSize * 0.3, py, cellSize * 0.3, ph);
+        else if (outputSide === 'top') ctx.fillRect(px, py, pw, cellSize * 0.3);
+        else if (outputSide === 'bottom') ctx.fillRect(px, py + ph - cellSize * 0.3, pw, cellSize * 0.3);
     }
 
     // === PLACEMENT LOGIC ===
@@ -544,7 +624,7 @@
         if (!canPlaceFacility(x, y, def.w, def.h)) return false;
 
         saveState();
-        facilities.push({ type, x, y, id: Date.now() });
+        facilities.push({ type, x, y, id: Date.now(), rotation: currentRotation });
         render();
         return true;
     }
@@ -558,38 +638,39 @@
         // Check adjacent facilities
         for (const f of facilities) {
             const def = FACILITIES[f.type];
-            if (!def.inputSide && !def.outputSide) continue;
+            const { inputSide, outputSide } = getEffectiveSides(def, f.rotation || 0);
+            if (!inputSide && !outputSide) continue;
 
             // Check if conveyor is adjacent to facility OUTPUT (conveyor goes AWAY)
-            if (def.outputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
-                return 'r'; // Exit to the right
+            if (outputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
+                return 'r';
             }
-            if (def.outputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
-                return 'd'; // Exit downward
+            if (outputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
+                return 'd';
             }
-            if (def.outputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
-                return 'l'; // Exit to the left
+            if (outputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
+                return 'l';
             }
-            if (def.outputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
-                return 'u'; // Exit upward
+            if (outputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
+                return 'u';
             }
 
             // Check if conveyor is adjacent to facility INPUT (conveyor goes TOWARD)
-            if (def.inputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
-                return 'r'; // Enter from left
+            if (inputSide === 'left' && x === f.x - 1 && y >= f.y && y < f.y + def.h) {
+                return 'r';
             }
-            if (def.inputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
-                return 'd'; // Enter from top
+            if (inputSide === 'top' && y === f.y - 1 && x >= f.x && x < f.x + def.w) {
+                return 'd';
             }
-            if (def.inputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
-                return 'l'; // Enter from right
+            if (inputSide === 'right' && x === f.x + def.w && y >= f.y && y < f.y + def.h) {
+                return 'l';
             }
-            if (def.inputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
-                return 'u'; // Enter from bottom
+            if (inputSide === 'bottom' && y === f.y + def.h && x >= f.x && x < f.x + def.w) {
+                return 'u';
             }
 
             // Storage (any side = input) - point toward storage
-            if (def.inputSide === 'any') {
+            if (inputSide === 'any') {
                 if (x === f.x - 1 && y >= f.y && y < f.y + def.h) return 'r';
                 if (x === f.x + def.w && y >= f.y && y < f.y + def.h) return 'l';
                 if (y === f.y - 1 && x >= f.x && x < f.x + def.w) return 'd';
@@ -597,7 +678,7 @@
             }
 
             // Drill/Pump (any side = output) - point away
-            if (def.outputSide === 'any') {
+            if (outputSide === 'any') {
                 if (x === f.x - 1 && y >= f.y && y < f.y + def.h) return 'l';
                 if (x === f.x + def.w && y >= f.y && y < f.y + def.h) return 'r';
                 if (y === f.y - 1 && x >= f.x && x < f.x + def.w) return 'u';
@@ -705,7 +786,7 @@
             name,
             author: 'User',
             date: new Date().toISOString().split('T')[0],
-            facilities: facilities.map(f => ({ type: f.type, x: f.x, y: f.y })),
+            facilities: facilities.map(f => ({ type: f.type, x: f.x, y: f.y, rotation: f.rotation || 0 })),
             conveyors
         };
 
@@ -741,7 +822,7 @@
                 try {
                     const data = JSON.parse(event.target.result);
                     saveState();
-                    facilities = data.facilities.map(f => ({ ...f, id: Date.now() + Math.random() }));
+                    facilities = data.facilities.map(f => ({ ...f, id: Date.now() + Math.random(), rotation: f.rotation || 0 }));
                     conveyors = data.conveyors || [];
                     render();
                     alert('Загружено: ' + data.name);
@@ -858,6 +939,11 @@
         if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
         if (e.key === 'Escape') {
             document.querySelector('[data-tool="select"]').click();
+        }
+        if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
+            currentRotation = (currentRotation + 1) % 4;
+            document.getElementById('rotationLabel').textContent = 'R: ' + (currentRotation * 90) + '°';
+            render();
         }
     });
 
