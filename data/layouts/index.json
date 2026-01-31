@@ -82,5 +82,11 @@
     "file": "steel_v2.json",
     "author": "Claude",
     "description": "С указанием рецептов для валидации ресурсов"
+  },
+  {
+    "name": "Сталь v3 (компакт)",
+    "file": "steel_v3.json",
+    "author": "Claude",
+    "description": "Компактная схема с рецептами для валидации"
   }
 ]
