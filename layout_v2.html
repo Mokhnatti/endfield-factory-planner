@@ -229,6 +229,7 @@
                 <button class="primary" onclick="exportJSON()">📤 Экспорт</button>
                 <button onclick="importJSON()">📥 Импорт</button>
                 <button id="flagsBtn" onclick="toggleTileFlags()">🏷️ Коды</button>
+                <button id="validateBtn" onclick="runValidation()" style="background:#c44;">🔍 Валидация</button>
                 <span id="rotationLabel" class="status" style="color:#ffd700">R: 0°</span>
                 <span class="status">ЛКМ - ставить | ПКМ - удалять | R - поворот</span>
             </div>
@@ -243,6 +244,13 @@
                 <div><span>Пилонов:</span> <b id="statPylons">0</b></div>
                 <div><span>Площадь:</span> <b id="statArea">0</b> / 3519</div>
                 <div id="validationMsg" class="validation-ok"></div>
+            </div>
+            <div id="validationPanel" style="display:none; background:#1a1a2e; border:1px solid #444; border-radius:8px; padding:10px; margin-top:10px; max-height:300px; overflow-y:auto;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <b style="color:#fff;">Результаты валидации</b>
+                    <button onclick="document.getElementById('validationPanel').style.display='none'" style="padding:2px 8px;">✕</button>
+                </div>
+                <div id="validationResults" style="font-size:12px; font-family:monospace;"></div>
             </div>
         </div>
     </div>
@@ -1095,6 +1103,261 @@
         showTileFlags = !showTileFlags;
         document.getElementById('flagsBtn').textContent = showTileFlags ? '🏷️ Коды: ВКЛ' : '🏷️ Коды';
         render();
+    }
+
+    // === VALIDATION SYSTEM ===
+    function runValidation() {
+        const errors = [];
+        const warnings = [];
+
+        // 1. Check facility overlaps
+        for (let i = 0; i < facilities.length; i++) {
+            const f1 = facilities[i];
+            const def1 = FACILITIES[f1.type];
+            for (let j = i + 1; j < facilities.length; j++) {
+                const f2 = facilities[j];
+                const def2 = FACILITIES[f2.type];
+                if (rectsOverlap(f1.x, f1.y, def1.w, def1.h, f2.x, f2.y, def2.w, def2.h)) {
+                    errors.push(`❌ ПЕРЕСЕЧЕНИЕ: ${f1.type} (${f1.x},${f1.y}) и ${f2.type} (${f2.x},${f2.y})`);
+                }
+            }
+        }
+
+        // 2. Check conveyors inside facilities
+        for (const c of conveyors) {
+            const flags = getTileFlags(c.x, c.y);
+            if (flags.includes('F')) {
+                errors.push(`❌ КОНВЕЙЕР ВНУТРИ СТАНКА: (${c.x},${c.y})`);
+            }
+        }
+
+        // 3. Check pylon coverage
+        const pylons = facilities.filter(f => f.type === 'pylon');
+        const nonPylons = facilities.filter(f => f.type !== 'pylon' && f.type !== 'hub');
+
+        for (const f of nonPylons) {
+            const def = FACILITIES[f.type];
+            let covered = false;
+            for (const p of pylons) {
+                const pDef = FACILITIES['pylon'];
+                const centerX = p.x + 1;
+                const centerY = p.y + 1;
+                const coverage = pDef.coverage || 12;
+                const covX1 = centerX - coverage / 2;
+                const covY1 = centerY - coverage / 2;
+                const covX2 = centerX + coverage / 2;
+                const covY2 = centerY + coverage / 2;
+
+                // Check if at least 1 tile of facility touches coverage
+                if (f.x < covX2 && f.x + def.w > covX1 && f.y < covY2 && f.y + def.h > covY1) {
+                    covered = true;
+                    break;
+                }
+            }
+            if (!covered) {
+                errors.push(`❌ НЕТ ПИТАНИЯ: ${f.type} (${f.x},${f.y}) не покрыт пилоном`);
+            }
+        }
+
+        // 4. Check pylons not on facilities or conveyors
+        for (const p of pylons) {
+            for (let dy = 0; dy < 2; dy++) {
+                for (let dx = 0; dx < 2; dx++) {
+                    const flags = getTileFlags(p.x + dx, p.y + dy);
+                    if (flags.includes('F') && !(p.x + dx >= p.x && p.x + dx < p.x + 2 && p.y + dy >= p.y && p.y + dy < p.y + 2)) {
+                        errors.push(`❌ ПИЛОН НА СТАНКЕ: (${p.x},${p.y})`);
+                    }
+                    if (flags.includes('C')) {
+                        errors.push(`❌ ПИЛОН НА КОНВЕЙЕРЕ: (${p.x},${p.y}) - конвейер на (${p.x+dx},${p.y+dy})`);
+                    }
+                }
+            }
+        }
+
+        // 5. Check conveyor connections (most important!)
+        for (const c of conveyors) {
+            const flags = getTileFlags(c.x, c.y);
+
+            // Conveyor should be in an I zone (entering facility) or O zone (leaving facility) or neither (transit)
+            const isInInput = flags.includes('I');
+            const isInOutput = flags.includes('O');
+
+            // Check direction makes sense
+            const nextX = c.dir === 'r' ? c.x + 1 : c.dir === 'l' ? c.x - 1 : c.x;
+            const nextY = c.dir === 'd' ? c.y + 1 : c.dir === 'u' ? c.y - 1 : c.y;
+            const nextFlags = getTileFlags(nextX, nextY);
+
+            // If in OUTPUT zone, conveyor should point AWAY from facility
+            if (isInOutput && !isInInput) {
+                // Find which facility this output belongs to
+                for (const f of facilities) {
+                    const def = FACILITIES[f.type];
+                    const rot = f.rotation || 0;
+                    const { outputSide } = getEffectiveSides(def, rot);
+
+                    let isThisOutput = false;
+                    if (outputSide === 'right' && c.x === f.x + def.w && c.y >= f.y && c.y < f.y + def.h) isThisOutput = true;
+                    if (outputSide === 'left' && c.x === f.x - 1 && c.y >= f.y && c.y < f.y + def.h) isThisOutput = true;
+                    if (outputSide === 'bottom' && c.y === f.y + def.h && c.x >= f.x && c.x < f.x + def.w) isThisOutput = true;
+                    if (outputSide === 'top' && c.y === f.y - 1 && c.x >= f.x && c.x < f.x + def.w) isThisOutput = true;
+
+                    if (isThisOutput) {
+                        // Check direction points away
+                        let correctDir = null;
+                        if (outputSide === 'right') correctDir = 'r';
+                        if (outputSide === 'left') correctDir = 'l';
+                        if (outputSide === 'bottom') correctDir = 'd';
+                        if (outputSide === 'top') correctDir = 'u';
+
+                        if (c.dir !== correctDir && !isInInput) {
+                            warnings.push(`⚠️ НАПРАВЛЕНИЕ: Конвейер (${c.x},${c.y}) в выходе ${f.type}, но направлен '${c.dir}' вместо '${correctDir}'`);
+                        }
+                    }
+                }
+            }
+
+            // If in INPUT zone (and not also output), conveyor should point INTO facility
+            if (isInInput && !isInOutput) {
+                for (const f of facilities) {
+                    const def = FACILITIES[f.type];
+                    const rot = f.rotation || 0;
+                    const { inputSide } = getEffectiveSides(def, rot);
+
+                    let isThisInput = false;
+                    if (inputSide === 'left' && c.x === f.x - 1 && c.y >= f.y && c.y < f.y + def.h) isThisInput = true;
+                    if (inputSide === 'right' && c.x === f.x + def.w && c.y >= f.y && c.y < f.y + def.h) isThisInput = true;
+                    if (inputSide === 'top' && c.y === f.y - 1 && c.x >= f.x && c.x < f.x + def.w) isThisInput = true;
+                    if (inputSide === 'bottom' && c.y === f.y + def.h && c.x >= f.x && c.x < f.x + def.w) isThisInput = true;
+
+                    if (isThisInput) {
+                        let correctDir = null;
+                        if (inputSide === 'left') correctDir = 'r';
+                        if (inputSide === 'right') correctDir = 'l';
+                        if (inputSide === 'top') correctDir = 'd';
+                        if (inputSide === 'bottom') correctDir = 'u';
+
+                        if (c.dir !== correctDir) {
+                            warnings.push(`⚠️ НАПРАВЛЕНИЕ: Конвейер (${c.x},${c.y}) во входе ${f.type}, но направлен '${c.dir}' вместо '${correctDir}'`);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 6. Check for disconnected outputs (facilities with no conveyor in output zone)
+        for (const f of nonPylons) {
+            if (f.type === 'storage') continue; // Storage doesn't need output
+            const def = FACILITIES[f.type];
+            const rot = f.rotation || 0;
+            const { outputSide } = getEffectiveSides(def, rot);
+
+            if (!outputSide) continue;
+
+            let hasOutputConveyor = false;
+            if (outputSide === 'right') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    if (conveyors.some(c => c.x === f.x + def.w && c.y === f.y + dy)) {
+                        hasOutputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (outputSide === 'left') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    if (conveyors.some(c => c.x === f.x - 1 && c.y === f.y + dy)) {
+                        hasOutputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (outputSide === 'bottom') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    if (conveyors.some(c => c.x === f.x + dx && c.y === f.y + def.h)) {
+                        hasOutputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (outputSide === 'top') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    if (conveyors.some(c => c.x === f.x + dx && c.y === f.y - 1)) {
+                        hasOutputConveyor = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasOutputConveyor) {
+                warnings.push(`⚠️ НЕТ ВЫХОДА: ${f.type} (${f.x},${f.y}) - нет конвейера в зоне выхода (${outputSide})`);
+            }
+        }
+
+        // 7. Check for disconnected inputs
+        for (const f of nonPylons) {
+            const def = FACILITIES[f.type];
+            const rot = f.rotation || 0;
+            const { inputSide } = getEffectiveSides(def, rot);
+
+            if (!inputSide) continue;
+
+            let hasInputConveyor = false;
+            if (inputSide === 'left') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    if (conveyors.some(c => c.x === f.x - 1 && c.y === f.y + dy)) {
+                        hasInputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (inputSide === 'right') {
+                for (let dy = 0; dy < def.h; dy++) {
+                    if (conveyors.some(c => c.x === f.x + def.w && c.y === f.y + dy)) {
+                        hasInputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (inputSide === 'top') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    if (conveyors.some(c => c.x === f.x + dx && c.y === f.y - 1)) {
+                        hasInputConveyor = true;
+                        break;
+                    }
+                }
+            } else if (inputSide === 'bottom') {
+                for (let dx = 0; dx < def.w; dx++) {
+                    if (conveyors.some(c => c.x === f.x + dx && c.y === f.y + def.h)) {
+                        hasInputConveyor = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasInputConveyor) {
+                warnings.push(`⚠️ НЕТ ВХОДА: ${f.type} (${f.x},${f.y}) - нет конвейера в зоне входа (${inputSide})`);
+            }
+        }
+
+        // Display results
+        const panel = document.getElementById('validationPanel');
+        const results = document.getElementById('validationResults');
+        panel.style.display = 'block';
+
+        if (errors.length === 0 && warnings.length === 0) {
+            results.innerHTML = '<div style="color:#4f4;">✅ Схема валидна! Ошибок нет.</div>';
+        } else {
+            let html = '';
+            if (errors.length > 0) {
+                html += '<div style="color:#f44; margin-bottom:8px;"><b>ОШИБКИ (' + errors.length + '):</b></div>';
+                html += errors.map(e => '<div style="color:#f88; padding-left:10px;">' + e + '</div>').join('');
+            }
+            if (warnings.length > 0) {
+                html += '<div style="color:#fa0; margin-top:8px; margin-bottom:8px;"><b>ПРЕДУПРЕЖДЕНИЯ (' + warnings.length + '):</b></div>';
+                html += warnings.map(w => '<div style="color:#fc8; padding-left:10px;">' + w + '</div>').join('');
+            }
+            results.innerHTML = html;
+        }
+
+        return { errors, warnings };
+    }
+
+    function rectsOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+        return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
     }
 
     // === STATS ===
