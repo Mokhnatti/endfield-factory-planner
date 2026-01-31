@@ -517,6 +517,65 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(def.name, x + w/2, y + h/2);
 
+        // Draw CONNECTION ZONES (1 tile OUTSIDE the facility)
+        const zoneAlpha = 0.25;
+
+        // Input connection zone (orange) - where conveyors should ENTER
+        if (inputSide === 'left') {
+            ctx.fillStyle = `rgba(255, 150, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillRect((f.x - 1) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+            }
+        } else if (inputSide === 'top') {
+            ctx.fillStyle = `rgba(255, 150, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillRect((f.x + i) * cellSize, (f.y - 1) * cellSize, cellSize, cellSize);
+            }
+        } else if (inputSide === 'right') {
+            ctx.fillStyle = `rgba(255, 150, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillRect((f.x + def.w) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+            }
+        } else if (inputSide === 'bottom') {
+            ctx.fillStyle = `rgba(255, 150, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillRect((f.x + i) * cellSize, (f.y + def.h) * cellSize, cellSize, cellSize);
+            }
+        }
+
+        // Output connection zone (green) - where conveyors should EXIT FROM
+        if (outputSide === 'right') {
+            ctx.fillStyle = `rgba(0, 200, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillRect((f.x + def.w) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+            }
+        } else if (outputSide === 'bottom') {
+            ctx.fillStyle = `rgba(0, 200, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillRect((f.x + i) * cellSize, (f.y + def.h) * cellSize, cellSize, cellSize);
+            }
+        } else if (outputSide === 'left') {
+            ctx.fillStyle = `rgba(0, 200, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillRect((f.x - 1) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+            }
+        } else if (outputSide === 'top') {
+            ctx.fillStyle = `rgba(0, 200, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillRect((f.x + i) * cellSize, (f.y - 1) * cellSize, cellSize, cellSize);
+            }
+        } else if (outputSide === 'any') {
+            ctx.fillStyle = `rgba(0, 200, 0, ${zoneAlpha})`;
+            for (let i = 0; i < def.w; i++) {
+                ctx.fillRect((f.x + i) * cellSize, (f.y - 1) * cellSize, cellSize, cellSize);
+                ctx.fillRect((f.x + i) * cellSize, (f.y + def.h) * cellSize, cellSize, cellSize);
+            }
+            for (let i = 0; i < def.h; i++) {
+                ctx.fillRect((f.x - 1) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+                ctx.fillRect((f.x + def.w) * cellSize, (f.y + i) * cellSize, cellSize, cellSize);
+            }
+        }
+
         // Pylon coverage
         if (f.type === 'pylon' && def.coverage) {
             const coverage = def.coverage;
