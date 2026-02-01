@@ -890,7 +890,7 @@
 
         const totalOreForBatteries = batteryOreCost.originium_ore + batteryOreCost.amethyst_ore + batteryOreCost.ferrite_ore;
 
-        const netBonds = totalBondsPerMin - (bestGenerator?.info?.lostBonds || 0);
+        const netBonds = totalBondsPerMin;
 
         document.getElementById('totalBonds').innerHTML =
             `${netBonds.toFixed(1)} <span style="font-size:18px;color:#4fc3f7">обл/мин (чистая прибыль)</span>`;
