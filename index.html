@@ -320,13 +320,34 @@
                 </div>
             </div>
             <button class="btn" onclick="calculate()">Рассчитать</button>
-            <div id="calcResult" style="display:none; margin-top:20px;">
+        </div>
+
+        <div id="calcResult" style="display:none;">
+            <div class="panel">
                 <div class="total-bonds">
                     <span>Скорость облигаций:</span><br>
                     <span id="totalBonds">0</span>
                 </div>
-                <div class="section-title">Производство:</div>
+            </div>
+
+            <div class="panel">
+                <h2>📦 Производство</h2>
                 <div class="items-grid" id="craftList"></div>
+            </div>
+
+            <div class="panel" id="oreLinesSection" style="display:none;">
+                <h2>⛏️ Входные линии руды</h2>
+                <div id="oreLinesContent"></div>
+            </div>
+
+            <div class="panel" id="facilitiesSection" style="display:none;">
+                <h2>🏭 Станки и площадь</h2>
+                <div id="facilitiesContent"></div>
+            </div>
+
+            <div class="panel" id="energySection" style="display:none;">
+                <h2>⚡ Энергопотребление</h2>
+                <div id="energyContent"></div>
             </div>
         </div>
 
@@ -919,8 +940,7 @@
         const totalOutputs = baseOutputs + outpostOutputs;
         const outputsRemaining = totalOutputs - oreLines.total;
 
-        craftHtml += `<div class="ore-lines-panel">
-            <h3>⛏️ Входные линии руды (конвейер ${CONVEYOR_SPEED}/мин)</h3>
+        let oreLinesHtml = `<div style="font-size:14px;color:#888;margin-bottom:15px">Конвейер: ${CONVEYOR_SPEED}/мин</div>
             <div class="ore-lines-grid">
                 <div class="ore-line-box">
                     <div class="icon">🟡</div>
@@ -961,8 +981,10 @@
                     <div class="label">${outputsRemaining >= 0 ? 'Свободно' : 'Не хватает!'}</div>
                     <div class="value">${Math.abs(outputsRemaining)}</div>
                 </div>
-            </div>` : ''}
-        </div>`;
+            </div>` : ''}`;
+
+        let facilitiesHtml = '';
+        let energyHtml = '';
 
         if (Object.keys(totalFacilities).length > 0 || Object.keys(batteryFacilities).length > 0) {
             let totalEffectiveArea = 0;
@@ -1029,9 +1051,7 @@
             const availableArea = grossArea - blockedByStructures;
             const remainingArea = availableArea - totalEffectiveArea;
 
-            craftHtml += `<div class="facilities-panel">
-                <h3>🏭 Станки и площадь</h3>
-                <table class="facilities-table">
+            facilitiesHtml = `<table class="facilities-table">
                     <thead>
                         <tr><th>Станок</th><th style="text-align:center">Размер</th><th style="text-align:center">Кол-во</th><th style="text-align:right">Площадь</th></tr>
                     </thead>
@@ -1057,18 +1077,10 @@
                         <div class="label">${remainingArea >= 0 ? 'Свободно' : 'Не хватает!'}</div>
                         <div class="value">${Math.abs(remainingArea)}</div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
         }
 
         if (bestGenerator && bestGenerator.gen) {
-            craftHtml += `<div class="info" style="margin-top:10px;background:rgba(255,100,0,0.15);border-left-color:#ff6600">
-                <b>Руда на батареи:</b> ${totalOreForBatteries.toFixed(0)}/мин
-                (Ориджиний: ${batteryOreCost.originium_ore.toFixed(0)},
-                 Аметист: ${batteryOreCost.amethyst_ore.toFixed(0)},
-                 Феррий: ${batteryOreCost.ferrite_ore.toFixed(0)})
-            </div>`;
-
             let facilityRows = facilityEnergyDetails.map(f =>
                 `<div class="energy-row" style="padding-left:20px;font-size:13px">
                     <span class="label">${f.name} (${f.count} × ${f.power})</span>
@@ -1091,9 +1103,13 @@
                 }).join('');
             }
 
-            craftHtml += `
-            <div class="energy-panel">
-                <h3>⚡ Энергопотребление (итерация ${iterations})</h3>
+            energyHtml = `
+                <div class="info" style="margin-bottom:15px;background:rgba(255,100,0,0.15);border-left-color:#ff6600">
+                    <b>Руда на батареи:</b> ${totalOreForBatteries.toFixed(0)}/мин
+                    (Ориджиний: ${batteryOreCost.originium_ore.toFixed(0)},
+                     Аметист: ${batteryOreCost.amethyst_ore.toFixed(0)},
+                     Феррий: ${batteryOreCost.ferrite_ore.toFixed(0)})
+                </div>
                 <div class="energy-row">
                     <span class="label">🔨 Буры (${drillsNeeded} шт × ${DRILL_POWER} кВт)</span>
                     <span class="value">${drillEnergy} кВт</span>
@@ -1128,20 +1144,20 @@
                     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);text-align:center">
                         <span style="color:#4fc3f7;font-size:20px;font-weight:bold">ЧИСТАЯ ПРИБЫЛЬ: ${netBonds.toFixed(0)} обл/мин</span>
                     </div>
-                </div>
-            </div>`;
-
-            console.log('=== Энергия ===');
-            console.log('Использовано руды/мин:', usedOrePerMin.toFixed(1));
-            console.log('Воды/мин:', totalWaterPerMin.toFixed(1));
-            console.log('Буров:', drillsNeeded, '=', drillEnergy, 'кВт');
-            console.log('Насосов:', pumpsNeeded, '=', pumpEnergy, 'кВт');
-            console.log('Станки товары:', facilityEnergy, 'кВт');
-            console.log('Станки батареи:', batteryFacilityEnergy, 'кВт');
-            console.log('Итого:', totalEnergy, 'кВт');
+                </div>`;
         }
 
-        craftList.innerHTML = craftHtml || '<div style="color:#888">Нет ресурсов для крафта</div>';
+        document.getElementById('craftList').innerHTML = craftHtml || '<div style="color:#888">Нет ресурсов для крафта</div>';
+
+        document.getElementById('oreLinesContent').innerHTML = oreLinesHtml;
+        document.getElementById('oreLinesSection').style.display = oreLinesHtml ? 'block' : 'none';
+
+        document.getElementById('facilitiesContent').innerHTML = facilitiesHtml;
+        document.getElementById('facilitiesSection').style.display = facilitiesHtml ? 'block' : 'none';
+
+        document.getElementById('energyContent').innerHTML = energyHtml;
+        document.getElementById('energySection').style.display = energyHtml ? 'block' : 'none';
+
         document.getElementById('calcResult').style.display = 'block';
     }
 
